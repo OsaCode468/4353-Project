@@ -1,7 +1,7 @@
 "use client";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
-export default function Login() {
+export default function Register() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const handleSubmit = (e) => {
@@ -13,7 +13,7 @@ export default function Login() {
       <Navbar />
       <div className="flex items-center justify-center mt-24">
         <div className="flex flex-col w-72 h-72 items-center bg-white rounded-lg">
-          <h1 className="text-black pt-7">Login</h1>
+          <h1 className="text-black pt-7">Register</h1>
           <div className="flex flex-col items-center justify-center h-full">
             <form className="flex flex-col items-center gap-5" onSubmit = {handleSubmit}>
 
@@ -34,9 +34,6 @@ export default function Login() {
               <button className=" w-20 text-black border border-solid border-black">Add</button>
             </form>
           </div>
-          <a className = "text-black" href = "/Registration">
-            Register
-          </a>
         </div>
       </div>
     </div>

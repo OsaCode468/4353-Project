@@ -5,13 +5,18 @@ const Navbar = () =>{
             <a href = "/">
               <li>Home</li>
             </a>
-            <li>Registration</li>
-            <a href = "login">
+            <a href="/Registration">
+              <li>Registration</li>
+            </a>
+            <a href = "Login">
               <li>Login</li>
             </a>
-            <li>Client Profile Management</li>
-            <li>Fuel Quote Form</li>
-            <li>Fuel Quote History</li>
+            <a href="ClientProfileManagement">
+              <li>Client Profile Management</li>
+            </a>
+            <a href="FuelQuoteHistory">
+              <li>Fuel Quote History</li>
+            </a>
           </ul>
         </div>
       );
