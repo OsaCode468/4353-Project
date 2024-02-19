@@ -5,13 +5,13 @@ const Navbar = () =>{
             <a href = "/">
               <li>Home</li>
             </a>
-            <h1>Registration</h1>
+            <li>Registration</li>
             <a href = "login">
               <li>Login</li>
             </a>
-            <h1>Client Profile Management</h1>
-            <h1>Fuel Quote Form</h1>
-            <h1>Fuel Quote History</h1>
+            <li>Client Profile Management</li>
+            <li>Fuel Quote Form</li>
+            <li>Fuel Quote History</li>
           </ul>
         </div>
       );
