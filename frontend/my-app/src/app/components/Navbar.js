@@ -14,6 +14,9 @@ const Navbar = () =>{
             <a href="ClientProfileManagement">
               <li>Client Profile Management</li>
             </a>
+            <a href="FuelQuoteForm">
+              <li>Fuel Quote Form</li>
+            </a>
             <a href="FuelQuoteHistory">
               <li>Fuel Quote History</li>
             </a>
