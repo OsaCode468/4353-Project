@@ -1,0 +1,19 @@
+.fuelquotehistorytable {
+    border: 2px solid var(--table-color);
+    text-align: center;
+    height: 200px;
+    width: 400px;
+    font-family: Calibri, Myriad;
+    width: 100%
+ }
+ 
+ .fuelquotehistorytable caption {
+    text-transform: uppercase;
+    background-color: var(--table-color);
+    color: white;
+    padding: 10px;
+ }
+ 
+ .fuelquotehistorytable tr:nth-child(even) {
+    background-color: var(--row-bg-color);
+ }
