@@ -17,7 +17,9 @@ const ClientProfileManagement = () => {
   // Placeholder array for states
   const statesArray = [
     { code: "TX", name: "Texas" },
-    // Add other states as needed
+    { code: "CA", name: "California" },
+    { code: "NY", name: "New York" },
+    //Can add other states as needed
   ];
 
   return (
@@ -70,9 +72,10 @@ const ClientProfileManagement = () => {
               <input
                 id="address-2"
                 type="text"
-                placeholder="University"
+                placeholder=" "
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
+                //NOT REQUIRED!!!
                 value={address2}
                 onChange={(e) => setAddress2(e.target.value)}
               />
@@ -111,6 +114,7 @@ const ClientProfileManagement = () => {
                   onChange={(e) => setState(e.target.value)}
                 >
                   <option value="">Select a state</option>
+                  //UTILIZE STATESARRAY, CAN ADD MORE
                   {statesArray.map((stateOption) => (
                     <option key={stateOption.code} value={stateOption.code}>
                       {stateOption.name}
@@ -132,6 +136,7 @@ const ClientProfileManagement = () => {
                 placeholder="12345"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 pattern="\d{5}(-\d{4})?"
+                //AT LEAST 5, NO MORE THAN 9 DIGITS FOR ZIPCODE
                 title="Enter a 5 or 9 digit zipcode"
                 required
                 value={zipcode}
