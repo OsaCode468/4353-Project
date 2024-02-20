@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from "../components/Navbar";
 
-export default function ClientProfileManagement() {
+const ClientProfileManagement = () => {
   const [fullName, setFullName] = useState("");
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
@@ -11,13 +11,14 @@ export default function ClientProfileManagement() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Handle the form submission to the backend
     console.log(fullName, address1, address2, city, state, zipcode);
   }
 
-  // Placeholder array for states
+  // Placeholder array for states, this would ideally come from your backend or a static file
   const statesArray = [
     { code: "TX", name: "Texas" },
-    // Adding other states as needed
+    // Add other states as needed
   ];
 
   return (
@@ -87,7 +88,7 @@ export default function ClientProfileManagement() {
               <input
                 id="city"
                 type="text"
-                placeholder="Houston"
+                placeholder="Austin"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
                 required
@@ -155,3 +156,6 @@ export default function ClientProfileManagement() {
     </div>
   );
 }
+
+export default ClientProfileManagement;
+
