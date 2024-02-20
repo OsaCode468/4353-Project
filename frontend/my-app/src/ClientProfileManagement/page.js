@@ -56,7 +56,7 @@ const ClientProfileManagement = () => {
               //(100 characters, required)
                 id="address-1"
                 type="text"
-                placeholder="4300 Martin Luther King Blvd"
+                placeholder="4302 University Drive"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
                 required
@@ -75,7 +75,7 @@ const ClientProfileManagement = () => {
               //(100 characters, optional**
                 id="address-2"
                 type="text"
-                placeholder=" "
+                placeholder="Room 203"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
                 //NOT REQUIRED!!!
@@ -138,7 +138,7 @@ const ClientProfileManagement = () => {
               //(9 characters, at least 5 character code required)
                 id="zipcode"
                 type="text"
-                placeholder="12345"
+                placeholder="77204"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 pattern="\d{5}(-\d{4})?"
                 //AT LEAST 5, NO MORE THAN 9 DIGITS FOR ZIPCODE
