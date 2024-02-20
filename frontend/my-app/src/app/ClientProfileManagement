@@ -11,11 +11,10 @@ const ClientProfileManagement = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle the form submission to the backend
     console.log(fullName, address1, address2, city, state, zipcode);
   }
 
-  // Placeholder array for states, this would ideally come from your backend or a static file
+  // Placeholder array for states
   const statesArray = [
     { code: "TX", name: "Texas" },
     // Add other states as needed
@@ -35,7 +34,7 @@ const ClientProfileManagement = () => {
               <input
                 id="full-name"
                 type="text"
-                placeholder="John Doe"
+                placeholder="Raj Singh"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="50"
                 required
@@ -53,7 +52,7 @@ const ClientProfileManagement = () => {
               <input
                 id="address-1"
                 type="text"
-                placeholder="123 Main St"
+                placeholder="4300 Martin Luther King Blvd"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
                 required
@@ -71,7 +70,7 @@ const ClientProfileManagement = () => {
               <input
                 id="address-2"
                 type="text"
-                placeholder="Apartment, studio, or floor"
+                placeholder="University"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
                 value={address2}
@@ -88,7 +87,7 @@ const ClientProfileManagement = () => {
               <input
                 id="city"
                 type="text"
-                placeholder="Austin"
+                placeholder="Houston"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
                 required
