@@ -119,7 +119,6 @@ const ClientProfileManagement = () => {
                   onChange={(e) => setState(e.target.value)}
                 >
                   <option value="">Select a state</option>
-                  //UTILIZE STATESARRAY, CAN ADD MORE
                   {statesArray.map((stateOption) => (
                     <option key={stateOption.code} value={stateOption.code}>
                       {stateOption.name}
