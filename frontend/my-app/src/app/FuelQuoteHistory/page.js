@@ -5,7 +5,7 @@ import classes from "./page.module.css";
 
 const data = [
   {
-    gallonsRequested: 500,
+    gallonsRequested: 550,
     deliveryAddress: "7404 Marlborough Rd. New Kensington, PA 15068",
     deliveryDate: "2024-05-20",
     priceGallon: 3.276,
