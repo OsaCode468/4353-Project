@@ -1,6 +1,6 @@
 const Navbar = () =>{
     return (
-        <div className="flex items-center justify-center bg-lime-500 h-48">
+        <div className="flex items-center justify-center bg-lime-500 h-32">
           <ul className = "flex gap-5">
             <a href = "/">
               <li>Home</li>

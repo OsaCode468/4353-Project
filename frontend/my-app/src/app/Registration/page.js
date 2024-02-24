@@ -11,7 +11,7 @@ export default function Register() {
   return (
     <div>
       <Navbar />
-      <div className="flex items-center justify-center mt-24">
+      <div className="flex items-center justify-center mt-10">
         <div className="flex flex-col w-72 h-72 items-center bg-white rounded-lg">
           <h1 className="text-black pt-7">Register</h1>
           <div className="flex flex-col items-center justify-center h-full">
