@@ -10,10 +10,32 @@ const ClientProfileManagement = () => {
   const [state, setState] = useState("");
   const [zipcode, setZipcode] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(fullName, address1, address2, city, state, zipcode);
-  }
+    const profileData = { fullName, address1, address2, city, state, zipcode };
+
+    try {
+      const response = await fetch('/api/clientmodule/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save profile. Please try again.');
+      }
+
+      const data = await response.json();
+      console.log('Profile saved successfully:', data);
+      // Here, you could also redirect the user or clear the form, etc.
+      alert('Profile saved successfully');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please check the console for more information.');
+    }
+  };
 
   // Placeholder array for states
   const statesArray = [
