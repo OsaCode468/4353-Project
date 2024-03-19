@@ -1,24 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const ClientProfile = require("../models/ClientProfile"); // Assuming you have a model like the one described
+
+// Simulated database with an in-memory array
+let clientProfiles = [];
 
 // Middleware for validation
 const validateClientProfile = (req, res, next) => {
-    const { fullName, address1, address2, city, state, zipcode } = req.body;
-    let errors = [];
-  
-    if (!fullName || fullName.length > 50) errors.push("Full name must be between 1 and 50 characters long.");
-    if (!address1 || address1.length > 100) errors.push("Address 1 must be between 1 and 100 characters long.");
-    if (address2 && address2.length > 100) errors.push("Address 2 must not exceed 100 characters.");
-    if (!city || city.length > 100) errors.push("City must be between 1 and 100 characters long.");
-    if (!state || state.length !== 2) errors.push("State must be exactly 2 characters long.");
-    if (!zipcode || !zipcode.match(/^\d{5}(-\d{4})?$/)) errors.push("Zipcode must be a valid 5 or 9 digit code.");
-  
-    if (errors.length > 0) {
-      return res.status(400).json({ message: "Validation error in one or more fields.", errors });
-    }
-    next();
-  };
+  const { fullName, address1, city, state, zipcode } = req.body;
+  let errors = [];
+
+  if (!fullName || fullName.length > 50) errors.push("Full name must be between 1 and 50 characters long.");
+  if (!address1 || address1.length > 100) errors.push("Address 1 must be between 1 and 100 characters long.");
+  if (req.body.address2 && req.body.address2.length > 100) errors.push("Address 2 must not exceed 100 characters.");
+  if (!city || city.length > 100) errors.push("City must be between 1 and 100 characters long.");
+  if (!state || state.length !== 2) errors.push("State must be exactly 2 characters long.");
+  if (!zipcode || !zipcode.match(/^\d{5}(-\d{4})?$/)) errors.push("Zipcode must be a valid 5 or 9 digit code.");
+
+  if (errors.length > 0) {
+    return res.status(400).json({ message: "Validation error in one or more fields.", errors });
+  }
+  next();
+};
   
 
 // GET route to fetch a client profile by ID
