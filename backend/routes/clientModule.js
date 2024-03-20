@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-// Simulated database with an in-memory array
+// Simulated in-memory "database" for client profiles
 let clientProfiles = [];
+let nextId = 1; // Start IDs at 1, increment for each new profile
 
 // Middleware for validation
 const validateClientProfile = (req, res, next) => {
@@ -21,44 +22,45 @@ const validateClientProfile = (req, res, next) => {
   }
   next();
 };
-  
 
-// GET route to fetch a client profile by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const profile = await ClientProfile.findById(req.params.id);
-    if (!profile) {
-      return res.status(404).json({ message: "Profile not found." });
-    }
-    res.json(profile);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
+// GET route to fetch all client profiles
+router.get("/", (req, res) => {
+  res.json(clientProfiles);
 });
 
 // POST route to create a new client profile
-router.post("/", validateClientProfile, async (req, res) => {
-  try {
-    const { fullName, address1, address2, city, state, zipcode } = req.body;
-    const newProfile = new ClientProfile({ fullName, address1, address2, city, state, zipcode });
-    const savedProfile = await newProfile.save();
-    res.status(201).json(savedProfile);
-  } catch (error) {
-    res.status(500).json({ message: "Server error while creating profile." });
-  }
+router.post("/", validateClientProfile, (req, res) => {
+  const newProfile = { id: nextId++, ...req.body }; // Assign an ID and increment nextId
+  clientProfiles.push(newProfile);
+  res.status(201).json(newProfile);
 });
 
 // PUT route to update an existing client profile
-router.put("/:id", validateClientProfile, async (req, res) => {
-  try {
-    const updatedProfile = await ClientProfile.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedProfile) {
-      return res.status(404).json({ message: "Profile not found." });
-    }
-    res.json(updatedProfile);
-  } catch (error) {
-    res.status(500).json({ message: "Server error while updating profile." });
+router.put("/:id", validateClientProfile, (req, res) => {
+  const { id } = req.params;
+  const index = clientProfiles.findIndex(profile => profile.id === parseInt(id));
+
+  if (index === -1) {
+    return res.status(404).json({ message: "Profile not found." });
   }
+
+  // Update profile in the "database"
+  clientProfiles[index] = { ...clientProfiles[index], ...req.body };
+  res.json(clientProfiles[index]);
+});
+
+// DELETE route to delete a client profile
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+  const index = clientProfiles.findIndex(profile => profile.id === parseInt(id));
+  
+  if (index === -1) {
+    return res.status(404).json({ message: "Profile not found." });
+  }
+
+  clientProfiles = clientProfiles.filter(profile => profile.id !== parseInt(id));
+  res.status(204).send();
 });
 
 module.exports = router;
+
