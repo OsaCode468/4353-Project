@@ -63,6 +63,56 @@ describe('Client Profile Management', () => {
     expect(response.statusCode).toBe(204);
   });
 
+
+ 
+  //POST validation for missing required fields
+  test('POST /api/clientmodule/ - Missing required fields results in error', async () => {
+    const response = await request(app)
+      .post('/api/clientmodule/')
+      .send({
+        state: "TX",
+        zipcode: "12345"
+        // Missing fullName, address1, and city
+      });
+  
+    expect(response.statusCode).toBe(400);
+    const errorMessages = response.body.errors;
+    const combinedErrorMessage = errorMessages.join(" "); 
+  
+    // Check for presence of specific error messages in the combined string
+    expect(combinedErrorMessage).toMatch(/Full name/);
+    expect(combinedErrorMessage).toMatch(/Address 1/);
+    expect(combinedErrorMessage).toMatch(/City/);
+  });
+  
+  
+
+    
+  //POST: Testing for Address2 validation with invalid data, should return an error
+  test('POST /api/clientmodule/ - Address2 validation (optional field)', async () => {
+    const profileWithLongAddress2 = {
+      fullName: "John Doe",
+      address1: "123 Main St",
+      address2: "A".repeat(101), // 101 characters long, exceeding the limit
+      city: "Anytown",
+      state: "TX",
+      zipcode: "12345"
+    };
+    const response = await request(app)
+      .post('/api/clientmodule/')
+      .send(profileWithLongAddress2);
+  
+    expect(response.statusCode).toBe(400);
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        "Address 2 must not exceed 100 characters."
+      ])
+    );
+  });
+  
+
+
+
   // POST with invalid data
   test('POST /api/clientmodule/ - should validate profile data', async () => {
     const invalidProfileData = {
