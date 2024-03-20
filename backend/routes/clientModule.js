@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-
+// Simulated in-memory "database" for client profiles
 let clientProfiles = [];
 let nextId = 1; // Start IDs at 1, increment for each new profile
 
