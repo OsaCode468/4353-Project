@@ -28,7 +28,6 @@ const ClientProfileManagement = () => {
 
       const data = await response.json();
       console.log('Profile saved successfully:', data);
-      // Here, you could also redirect the user or clear the form, etc.
       alert('Profile saved successfully');
     } catch (error) {
       console.error('Error saving profile:', error);
