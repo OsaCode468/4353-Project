@@ -1,6 +1,6 @@
 const request = require("supertest");
 const express = require("express");
-const router = require("../routes/fuelQuoteHistoryModule"); // Replace with the actual path to your router file
+const router = require("../routes/fuelQuoteHistoryModule");
 
 const app = express();
 app.use("/", router);
