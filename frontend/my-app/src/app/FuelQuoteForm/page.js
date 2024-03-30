@@ -1,4 +1,6 @@
 "use client";
+const Pricing = require('../../../../../backend/routes/pricingModule')
+const pg = new Pricing();
 import React, { useState } from 'react';
 import TotAmount from "../components/TotAmount"
 import Navbar from "../components/Navbar"
@@ -7,8 +9,9 @@ const FuelQuoteForm = () => {
     const [gallons, setGallons] = useState("");
     const [deliveryAddress, setDeliveryAddress] = useState("4302 University Drive");
     const [deliveryDate, setDeliveryDate] = useState("");
-    const [priceG, setPriceG] = useState("3.25");
+    const [priceG, setPriceG] = useState(pg.getPricePerGallon());
     const [formSubmitted, setFormSubmitted] = useState(false);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +24,7 @@ const FuelQuoteForm = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:4000/api/fuelquotemodule', { // Change the endpoint to your backend API endpoint
+            const response = await fetch('http://localhost:4000/api/fuelquotemodule', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,6 +35,7 @@ const FuelQuoteForm = () => {
             if (!response.ok) {
                 throw new Error('Failed to save fuel quote. Please try again.');
             }
+            console.log(formData);
 
             setFormSubmitted(true);
             console.log('Fuel quote saved successfully');
@@ -106,7 +110,7 @@ const FuelQuoteForm = () => {
                             <input
                                 id="city"
                                 type="number"
-                                placeholder="3.25"
+                                placeholder="3.87"
                                 className="appearance-none block w-full bg-gray-500 text-white border border-gray-200 rounded py-3 px-4 leading-tight"
                                 readOnly
                                 maxLength="100"
