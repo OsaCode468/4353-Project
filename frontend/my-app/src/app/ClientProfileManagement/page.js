@@ -1,4 +1,3 @@
-"use client"
 import React, { useState } from 'react';
 import Navbar from "../components/Navbar";
 
@@ -10,10 +9,32 @@ const ClientProfileManagement = () => {
   const [state, setState] = useState("");
   const [zipcode, setZipcode] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(fullName, address1, address2, city, state, zipcode);
-  }
+    const profileData = { fullName, address1, address2, city, state, zipcode };
+
+    try {
+      const response = await fetch('/api/clientmodule/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save profile. Please try again.');
+      }
+
+      const data = await response.json();
+      console.log('Profile saved successfully:', data);
+      alert('Profile saved successfully');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please check the console for more information.');
+    }
+  };
+
 
   // Placeholder array for states
   const statesArray = [
@@ -35,7 +56,7 @@ const ClientProfileManagement = () => {
                 Full Name
               </label>
               <input
-                //(50 characters, required)
+              //(50 characters, required)
                 id="full-name"
                 type="text"
                 placeholder="Raj Singh"
@@ -54,7 +75,7 @@ const ClientProfileManagement = () => {
                 Address 1
               </label>
               <input
-                //(100 characters, required)
+              //(100 characters, required)
                 id="address-1"
                 type="text"
                 placeholder="4302 University Drive"
@@ -73,7 +94,7 @@ const ClientProfileManagement = () => {
                 Address 2
               </label>
               <input
-                //(100 characters, optional**
+              //(100 characters, optional**
                 id="address-2"
                 type="text"
                 placeholder="Room 203"
@@ -92,7 +113,7 @@ const ClientProfileManagement = () => {
                 City
               </label>
               <input
-                //(100 characters, required)
+              //(100 characters, required)
                 id="city"
                 type="text"
                 placeholder="Houston"
@@ -112,7 +133,7 @@ const ClientProfileManagement = () => {
               </label>
               <div className="relative">
                 <select
-                  //(Drop Down, selection required) DB will store 2 character state code
+                //(Drop Down, selection required) DB will store 2 character state code
                   id="state"
                   className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   required
@@ -136,7 +157,7 @@ const ClientProfileManagement = () => {
                 Zipcode
               </label>
               <input
-                //(9 characters, at least 5 character code required)
+              //(9 characters, at least 5 character code required)
                 id="zipcode"
                 type="text"
                 placeholder="77204"
