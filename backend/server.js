@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 app.use("/api/login", loginRoutes)
 app.use("/api/clientmodule", clientModuleRoutes)
 app.use("/api/pricing", pricingRoutes)
-app.use("/api/fuelQuote", fuelRoutes)
+app.use("/api/fuelquotemodule", fuelRoutes)
 
 app.listen(process.env.PORT, () => {
     console.log('listening on port 4000')
