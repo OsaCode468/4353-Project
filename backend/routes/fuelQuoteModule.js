@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
         ppg
     };
 
-    console.log(req.body)
+    console.log(fuelQuote)
 
     fuelQuotes.push(fuelQuote);
 

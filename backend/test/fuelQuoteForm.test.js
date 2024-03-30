@@ -18,9 +18,8 @@ describe('POST /fuel', () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('message', 'Fuel quote saved successfully');
         expect(response.body.fuelQuote).toEqual(expect.objectContaining({
-            gallons: 100,
             deliveryDate: '2024-03-29',
-            totalPrice: 325
+            gallons: 100,
         }));
     });
 

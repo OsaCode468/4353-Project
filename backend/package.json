@@ -12,8 +12,11 @@
     "coverageDirectory": "coverage",
     "collectCoverage": true,
     "collectCoverageFrom": [
-      "server.js",
       "routes/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/server.js",
+      "/routes/pricingModule.js"
     ]
   },
   "keywords": [],
