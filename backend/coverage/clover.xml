@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1711767308348" clover="3.2.0">
-  <project timestamp="1711767308348" name="All files">
+<coverage generated="1711768031915" clover="3.2.0">
+  <project timestamp="1711768031915" name="All files">
     <metrics statements="86" coveredstatements="85" conditionals="48" coveredconditionals="47" methods="12" coveredmethods="12" elements="146" coveredelements="144" complexity="0" loc="86" ncloc="86" packages="1" files="4" classes="4"/>
     <file name="clientModule.js" path="/Users/osaidmohammad/4353-Project/backend/routes/clientModule.js">
       <metrics statements="37" coveredstatements="37" conditionals="30" coveredconditionals="30" methods="8" coveredmethods="8"/>
