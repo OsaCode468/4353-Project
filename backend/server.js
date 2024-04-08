@@ -12,7 +12,6 @@ const pricingRoutes = require("./routes/pricingModule")
 const fuelRoutes = require("./routes/fuelQuoteModule")
 const fuelHistoryRoutes = require("./routes/fuelQuoteHistoryModule")
 
-
 app.get("/", (req, res) => {
     res.send("hi")
 })
@@ -27,3 +26,4 @@ app.use("/api/fuelQuoteHistory", fuelHistoryRoutes)
 app.listen(process.env.PORT, () => {
     console.log('listening on port 4000')
 })
+
