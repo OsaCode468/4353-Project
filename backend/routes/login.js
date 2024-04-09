@@ -34,11 +34,20 @@ router.post("/", async (req, res) => {
         return res.status(400).json({ "err": "all fields must be filled" });
     }
     const client = await pool.connect()
+    const userExists = await client.query('SELECT COUNT(*) FROM users WHERE username = $1', [username])
+    if (parseInt(userExists.rows[0]?.count) > 0){
+        throw Error("Username already in use")
+    } 
+
+
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     try {
         statement = await client.query(`INSERT INTO users (username, password) VALUES($1, $2)`, [username, hash]);
-        console.log("User inserted successfully:", statement.rows[0]);
+        console.log("User inserted successfully:", statement);
+        const _id = await client.query("SELECT id FROM users WHERE username = $1", [username])
+        const id = _id.rows[0]?.id
+        const token = jwt.sign({id}, proces.env.SECRET, {expiresIn: '3d'})
     } catch (error) {
         console.error("Error inserting user:", error);
         return res.status(500).json({ "err": "Internal server error" });
