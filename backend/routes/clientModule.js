@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const client = require("../connection");  
+const pool = require("../connection");  
 
 // Middleware for validation
 const validateClientProfile = (req, res, next) => {
