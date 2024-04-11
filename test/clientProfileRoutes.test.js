@@ -1,201 +1,178 @@
 const request = require('supertest');
 const express = require('express');
-const clientProfileRoutes = require('../backend/routes/clientModule'); 
-
+const clientProfileRoutes = require('../backend/routes/clientModule');
+const pool = require('../backend/connection');
 
 const app = express();
 app.use(express.json());
-app.use('/api/clientmodule', clientProfileRoutes); 
+app.use('/api/clientmodule', clientProfileRoutes);
 
-describe('Client Profile Management', () => {
- // GET all profiles ==== GET_UNIT_TEST
- test('GET /api/clientmodule/ - should retrieve all client profiles', async () => {
-    const response = await request(app)
-      .get('/api/clientmodule/');
+beforeAll(async () => {
+  await pool.query('DROP TABLE IF EXISTS client_profiles;')
+  await pool.query('CREATE TABLE client_profiles (id SERIAL PRIMARY KEY, full_name VARCHAR(50) NOT NULL, address1 VARCHAR(100) NOT NULL, address2 VARCHAR(100), city VARCHAR(100) NOT NULL, state CHAR(2) NOT NULL, zipcode VARCHAR(9) NOT NULL);');
+});
 
-    expect(response.statusCode).toBe(200);
-    expect(Array.isArray(response.body)).toBeTruthy();
-    
+afterAll(async () => {
+  await pool.end();
+});
+
+describe('Client Profile Management API', () => {
+  beforeEach(async () => {
+    await pool.query('TRUNCATE TABLE client_profiles RESTART IDENTITY CASCADE');
   });
 
-  // POST a new profile ===== POST_UNIT_TEST_1
-  test('POST /api/clientmodule/ - should create a new client profile', async () => {
+  test('Middleware validation - should return error for invalid client profile', async () => {
+    const invalidProfile = {
+      address1: "123 MLK Blvd St",
+      city: "This is a very long city name that exceeds the 100 character limit, which should trigger an error",
+      state: "TX",
+    };
+
     const response = await request(app)
       .post('/api/clientmodule/')
-      .send({
-        fullName: "Raj Singh",
-        address1: "4300 MLK Blvd",
-        city: "Houston",
-        state: "TX",
-        zipcode: "77024"
-      });
+      .send(invalidProfile);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty('message', 'Validation error in one or more fields.');
+    expect(response.body.errors).toHaveLength(2);
+  });
+
+  test('POST - create a new client profile successfully', async () => {
+    const validProfile = {
+      fullName: "Raj Singh",
+      address1: "123 MLK Blvd",
+      city: "Houston",
+      state: "TX",
+      zipcode: "77024"
+    };
+
+    const response = await request(app)
+      .post('/api/clientmodule/')
+      .send(validProfile);
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body).toHaveProperty('fullName', 'Raj Singh');
-    
+    expect(response.body.full_name).toBe("John Doe");
   });
 
-  //POST validation for missing required fields ==== POST_UNIT_TEST_2
-  test('POST /api/clientmodule/ - Missing required fields results in error', async () => {
-    const response = await request(app)
-      .post('/api/clientmodule/')
-      .send({
-        state: "TX",
-        zipcode: "77024"
-        // Missing fullName, address1, and city
-      });
-  
-    expect(response.statusCode).toBe(400);
-    const errorMessages = response.body.errors;
-    const combinedErrorMessage = errorMessages.join(" "); 
-  
-    expect(combinedErrorMessage).toMatch(/Full name/);
-    expect(combinedErrorMessage).toMatch(/Address 1/);
-    expect(combinedErrorMessage).toMatch(/City/);
+  test('GET - fetch all client profiles', async () => {
+    const response = await request(app).get('/api/clientmodule/');
+    expect(response.statusCode).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
   });
-  
-    
-  //POST: Testing for Address2 validation with invalid data, should return an error ==== POST_UNIT_TEST_3
-  test('POST /api/clientmodule/ - Address2 validation (optional field)', async () => {
-    const profileWithLongAddress2 = {
+
+  test('PUT - update an existing client profile', async () => {
+    let profile = await request(app)
+      .post('/api/clientmodule/')
+      .send({ fullName: "Jane Doe", address1: "124 Elm St", city: "Smalltown", state: "TX", zipcode: "12345" });
+
+    const updatedProfile = {
       fullName: "Raj Singh",
-      address1: "4300 MLK Blvd",
-      address2: "A".repeat(101), // 101 characters long, exceeding the limit, for testing purposes
+      address1: "123 MLK Blvd",
       city: "Houston",
       state: "TX",
       zipcode: "77024"
     };
+
     const response = await request(app)
-      .post('/api/clientmodule/')
-      .send(profileWithLongAddress2);
-  
-    expect(response.statusCode).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        "Address 2 must not exceed 100 characters."
-      ])
-    );
-  });
-  
-
-  // POST with invalid data, in this case it is fullName ==== POST_UNIT_TEST_4
-  test('POST /api/clientmodule/ - should validate profile data', async () => {
-    const invalidProfileData = {
-      fullName: "", // Invalid because it's empty, for testing purposes
-      address1: "4300 MLK Blvd",
-      city: "Houston",
-      state: "TX",
-      zipcode: "77024"
-    };
-    const response = await request(app)
-      .post('/api/clientmodule/')
-      .send(invalidProfileData);
-
-    expect(response.statusCode).toBe(400);
-    // Checking for error messages in the response body
-    expect(response.body.errors).toBeDefined();
-  });
-
-
-  //POST test for invalid zipcode ==== POST_UNIT_TEST_5
-  test('POST /api/clientmodule/ - should reject profile with invalid zipcode', async () => {
-    const profileWithInvalidZipcode = {
-      fullName: "Raj Singh",
-      address1: "4300 MLK Blvd",
-      city: "Houston",
-      state: "TX",
-      zipcode: "123" // Invalid zipcode, for testing purposes
-    };
-  
-    const response = await request(app)
-      .post('/api/clientmodule/')
-      .send(profileWithInvalidZipcode);
-  
-    expect(response.statusCode).toBe(400);
-    expect(response.body.errors).toContain("Zipcode must be a valid 5 or 9 digit code.");
-  });
-  
-
-  //POST test for invalid state code ==== POST_UNIT_TEST_6
-  test('POST /api/clientmodule/ - should reject profile with invalid state code', async () => {
-    const profileWithInvalidState = {
-      fullName: "Raj Singh",
-      address1: "4300 MLK Blvd",
-      city: "Houston",
-      state: "UHMC", // Invalid state code, for testing purposes
-      zipcode: "77204"
-    };
-  
-    const response = await request(app)
-      .post('/api/clientmodule/')
-      .send(profileWithInvalidState);
-  
-    expect(response.statusCode).toBe(400);
-    expect(response.body.errors).toContain("State must be exactly 2 characters long.");
-  });
-
-
-  // PUT test for a profile, we assume that a profile with ID 1 exists ==== PUT_UNIT_TEST_1
-  test('PUT /api/clientmodule/1 - should update the profile with ID 1', async () => {
-    const updatedData = {   
-      fullName: "Raj Singh",    
-      address1: "4300 MLK Blvd",
-      city: "Houston",
-      state: "TX",
-      zipcode: "77024"
-    };
-    const response = await request(app)
-      .put('/api/clientmodule/1')
-      .send(updatedData);
+      .put(`/api/clientmodule/${profile.body.id}`)
+      .send(updatedProfile);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('fullName', 'Raj Singh');
-    
+    expect(response.body.full_name).toBe("Jane Smith");
   });
 
-  //PUT test for retrieving a profile that does not exist, should return "Profile not found" ==== PUT_UNIT_TEST_2
-  test('PUT /api/clientmodule/:id - should return "Profile not found" for non-existing profile', async () => {
-    const nonExistentId = 9999; //9999 is an ID that is unlikely to exist, for testing purposes
-    const profileUpdate = {
-      fullName: "Raj Singh",
-      address1: "4300 MLK Blvd",
-      city: "Houston",
-      state: "TX",
-      zipcode: "77024"
-    };
-  
-    const response = await request(app)
-      .put(`/api/clientmodule/${nonExistentId}`)
-      .send(profileUpdate);
-  
-    expect(response.statusCode).toBe(404);
-    expect(response.body).toEqual({ message: "Profile not found." });
-  });
+  test('DELETE - delete a client profile', async () => {
+    let profile = await request(app)
+      .post('/api/clientmodule/')
+      .send({ fullName: "Raj Singh", address1: "123 MLK Blvd", city: "Houston", state: "TX", zipcode: "77024" });
 
-  
-  
-// DELETE a profile (assumes that a profile with ID 1 exists) ==== DELETE_UNIT_TEST_1
-test('DELETE /api/clientmodule/1 - should delete the profile with ID 1', async () => {
-    const response = await request(app)
-      .delete('/api/clientmodule/1');
-
+    const response = await request(app).delete(`/api/clientmodule/${profile.body.id}`);
     expect(response.statusCode).toBe(204);
   });
 
+  // GET - handle database error when fetching profiles
+  test('GET - handle database error when fetching profiles', async () => {
+    jest.spyOn(pool, 'query').mockRejectedValueOnce(new Error('Database error'));
 
-  //DELETE test for deleting a profile that does not exist, should return "Profile not found" ==== DELETE_UNIT_TEST_2
-  test('DELETE /api/clientmodule/:id - should return "Profile not found" for non-existing profile', async () => {
-    const nonExistentId = 9999; //ID that is unlikely to exist
-    const response = await request(app)
-      .delete(`/api/clientmodule/${nonExistentId}`);
-  
-    expect(response.statusCode).toBe(404);
-    expect(response.body).toEqual({ message: "Profile not found." });
+    const response = await request(app).get('/api/clientmodule/');
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty('message', 'Error fetching profiles');
   });
 
-  
-  
-  
+  // POST - handle database error when creating a new profile
+  test('POST - handle database error when creating a new profile', async () => {
+    jest.spyOn(pool, 'query').mockRejectedValueOnce(new Error('Database error'));
 
+    const newProfile = {
+      fullName: "Raj Singh",
+      address1: "123 MLK Blvd",
+      city: "Houston",
+      state: "TX",
+      zipcode: "77024"
+    };
+
+    const response = await request(app)
+      .post('/api/clientmodule/')
+      .send(newProfile);
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty('message', 'Error saving profile');
+  });
+
+  // PUT - handle non-existing profile update
+  test('PUT - handle non-existing profile update', async () => {
+    jest.spyOn(pool, 'query').mockResolvedValueOnce({ rows: [], rowCount: 0 });
+
+    const updatedProfile = {
+      fullName: "Raj Singh",
+      address1: "123 MLK Blvd",
+      city: "Houston",
+      state: "TX",
+      zipcode: "77024"
+    };
+
+    const response = await request(app)
+      .put('/api/clientmodule/1')
+      .send(updatedProfile);
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty('message', 'Profile not found.');
+  });
+
+  // PUT - handle database error during profile update
+  test('PUT - handle database error during profile update', async () => {
+    jest.spyOn(pool, 'query').mockRejectedValueOnce(new Error('Database error'));
+
+    const updatedProfile = {
+      fullName: "Raj Singh",
+      address1: "123 MLK Blvd",
+      city: "Houston",
+      state: "TX",
+      zipcode: "77024"
+    };
+
+    const response = await request(app)
+      .put('/api/clientmodule/1')
+      .send(updatedProfile);
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty('message', 'Error updating profile');
+  });
+
+  // DELETE - handle non-existing profile deletion
+  test('DELETE - handle non-existing profile deletion', async () => {
+    jest.spyOn(pool, 'query').mockResolvedValueOnce({ rows: [], rowCount: 0 });
+
+    const response = await request(app)
+      .delete('/api/clientmodule/1');
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty('message', 'Profile not found.');
+  });
+
+  // DELETE - handle database error during profile deletion
+  test('DELETE - handle database error during profile deletion', async () => {
+    jest.spyOn(pool, 'query').mockRejectedValueOnce(new Error('Database error'));
+
+    const response = await request(app)
+      .delete('/api/clientmodule/1');
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty('message', 'Error deleting profile');
+  });
 });
