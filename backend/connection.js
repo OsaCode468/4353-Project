@@ -8,4 +8,12 @@ const client = new pg.Pool({
     database: "fuelrateweb"
 })
 
+client.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Error executing query', err);
+    } else {
+        console.log('Connected to database at', res.rows[0].now);
+    }
+});
+
 module.exports = client

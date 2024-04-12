@@ -17,3 +17,22 @@
  .fuelquotehistorytable tr:nth-child(even) {
     background-color: var(--row-bg-color);
  }
+ 
+ .message {
+   margin-top: 20px;
+   font-size: 24px;
+   text-align: center;
+   color: white;
+   padding: 20px;
+   border-radius: 8px;
+   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+ }
+ 
+ .message::before {
+   content: '😔';
+   display: block;
+   font-size: 48px;
+   margin-bottom: 10px;
+ }
+ 
+

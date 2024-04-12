@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+//const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const pool = require("../connection")
@@ -27,7 +27,7 @@ router.post("/login", (req, res) => {
     res.status(200).json({ "jsonwebtoken": 5667 });
 });
 
-router.post("/", async (req, res) => {
+/*router.post("/", async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -60,6 +60,6 @@ router.post("/", async (req, res) => {
     // console.log(dummyuser);
 
     return res.status(200).json({"statement": statement});
-});
+});*/
 
 module.exports = router;
