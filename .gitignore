@@ -1,1 +1,6 @@
 node_modules
+backend/.nyc_output/processinfo/index.json
+backend/coverage/clover.xml
+backend/coverage/coverage-final.json
+backend/coverage/lcov-report/*.html
+backend/coverage/lcov.info
