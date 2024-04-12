@@ -1,13 +1,15 @@
 const request = require('supertest');
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { router, dummyuser, dummypass } = require('../routes/login')
-jest.mock('bcrypt');
+const router = require('../routes/login')
+const client = require("../connection")
+// jest.mock('bcrypt');
+
 
 describe('Express Routes', () => {
   let app;
 
-  beforeEach(() => {
+  beforeEach( () => {
     app = express();
     app.use(express.json());
     app.use('/', router);
@@ -37,12 +39,16 @@ describe('Express Routes', () => {
 
     it('should return 200 and jsonwebtoken if credentials are correct', async () => {
       // Mocking the behavior of your dummyuser and dummypass arrays
-      dummyuser.push('existingUsername');
-      dummypass.push('password');
-
+      const pool = await client.connect()
+      await pool.query("DROP TABLE USERS")
+      await pool.query("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL)")
+      const ress = await request(app)
+      .post('/')
+      .send({ username: 'existingUsername', password: 'password' });
       const res = await request(app)
         .post('/login')
         .send({ username: 'existingUsername', password: 'password' });
+      console.log(res.body)
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('jsonwebtoken');
     });
@@ -61,7 +67,9 @@ describe('Express Routes', () => {
         .post('/')
         .send({ username: 'newUser', password: 'newPassword' });
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ username: 'newUser' }); // Remove password expectation
+      expect(res.body).toHaveProperty('token');
+      expect(res.body).toHaveProperty('username');
+
     });
   });
 });
