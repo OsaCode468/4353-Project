@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const Pricing = require('./pricingModule');
-const pg = new Pricing();
+// const Pricing = require('./pricingModule');
+// const pg = new Pricing();
 const db = require('../connection'); // Import your database connection 
 
 // Assumming there is a function in the database module to fetch the delivery address
-router.get('/:id', async (req, res) => {
+router.get('/deliveryAddress/:id', async (req, res) => {
     try {
         const client = await db.connect()
         const id = req.params.id
@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
 
     try {
         const q = await client.query('SELECT id from users where username = $1', [userName])
-        console.log(q)
+        console.log("this is the " + q)
         const id = q.rows[0].id
         console.log(id)
         // Fetch delivery address from the database

@@ -14,18 +14,32 @@ const FuelQuoteForm = () => {
         // Fetch delivery address from backend when component mounts
         const fetchDeliveryAddress = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/deliveryAddress');
+                const response = await fetch('http://localhost:4000/api/fuelquotemodule/deliveryAddress/1');
                 if (!response.ok) {
                     throw new Error('Failed to fetch delivery address');
                 }
                 const data = await response.json();
-                setDeliveryAddress(data.deliveryAddress);
+                setDeliveryAddress(data.deliveryAddress[0].delivery_address);
+            } catch (error) {
+                console.error('Error fetching delivery address:', error);
+            }
+        };
+
+        const fetchPricePerGallon = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/api/pricing/pricePerGallon/1');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch delivery address');
+                }
+                const data = await response.json();
+                setPriceG(data.pricePerGallon[0].price_per_gallon)
             } catch (error) {
                 console.error('Error fetching delivery address:', error);
             }
         };
 
         fetchDeliveryAddress();
+        fetchPricePerGallon();
     }, []);
 
     const handleSubmit = async (e) => {
