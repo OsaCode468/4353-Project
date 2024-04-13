@@ -3,8 +3,10 @@ require('dotenv').config()
 const cors = require('cors')
 const express = require('express')
 const app = express()
-app.use(cors())
 app.use(express.json())
+app.use(cors())
+
+
 
 const loginRoutes = require("./routes/login")
 const clientModuleRoutes = require("./routes/clientModule")

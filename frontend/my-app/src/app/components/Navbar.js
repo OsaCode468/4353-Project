@@ -14,22 +14,22 @@ const Navbar = () =>{
             <a href = "/">
               <li>Home</li>
             </a>
-            <a href="/Registration">
+            <a href="/Registration/">
               <li>Registration</li>
             </a>
-            <a href = "Login">
+            <a href = "Login/">
               <li>Login</li>
             </a>
-            <a href="ClientProfileManagement">
+            <a href="ClientProfileManagement/">
               <li>Client Profile Management</li>
             </a>
-            <a href="FuelQuoteForm">
+            <a href="FuelQuoteForm/">
               <li>Fuel Quote Form</li>
             </a>
-            <a href="FuelQuoteHistory">
+            <a href="FuelQuoteHistory/">
               <li>Fuel Quote History</li>
             </a>
-            {user && (<div className ="flex gap-6"><span>{user.username}</span> <button onClick={handleClick}>Logout</button>
+            {user && (<div className ="flex gap-6"><span>{user.username ? user.username: user}</span> <button onClick={handleClick}>Logout</button>
               </div>)}
           </ul>
         </div>
