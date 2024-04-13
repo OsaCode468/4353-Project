@@ -54,6 +54,7 @@ router.post("/", async (req, res) => {
         const _id = await client.query("SELECT id FROM users WHERE username = $1", [username])
         const id = _id.rows[0]?.id
         const token = jwt.sign({id}, "YGBhNeFUN9iGuk8Hhed4qtx1thdxlOSX", {expiresIn: '3d'})
+        console.log("did it")
         res.status(200).json({username, token})
     } catch (error) {
         console.error("Error inserting user:", error);

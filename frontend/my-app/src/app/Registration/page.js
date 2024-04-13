@@ -4,9 +4,31 @@ import { useState } from "react";
 export default function Register() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     console.log(username, password)
+    const profileData = {username, password};
+
+    try {
+      const response = await fetch('http://localhost:4000/api/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create profile. Please try again.');
+      }
+
+      const data = await response.json();
+      console.log('Profile created successfully:', data);
+      alert('Profile saved successfully');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please check the console for more information.');
+    }
   }
   return (
     <div>

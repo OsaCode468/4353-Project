@@ -4,9 +4,10 @@ import { useState } from "react";
 export default function Login() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     console.log(username, password)
+    
   }
   return (
     <div>
