@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     try {
-        statement = await client.query(`INSERT INTO users (username, password) VALUES($1, $2)`, [username, password]); //replace with hash later
+        statement = await client.query(`INSERT INTO users (username, password) VALUES($1, $2)`, [username, hash]); //replace with hash later
         const _id = await client.query("SELECT id FROM users WHERE username = $1", [username])
         const id = _id.rows[0]?.id
         const token = jwt.sign({id}, "YGBhNeFUN9iGuk8Hhed4qtx1thdxlOSX", {expiresIn: '3d'})
