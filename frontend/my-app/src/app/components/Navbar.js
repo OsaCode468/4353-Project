@@ -1,4 +1,13 @@
+"use client"
+import { useAuthContext } from "../hooks/useAuthContext";
+
 const Navbar = () =>{
+  const {dispatch} = useAuthContext();
+  const {user} = useAuthContext();
+  const handleClick = () => {
+    localStorage.removeItem("user");
+    dispatch({ type: "LOGOUT" });
+  };
     return (
         <div className="flex items-center justify-center bg-lime-500 h-32">
           <ul className = "flex gap-5">
@@ -20,6 +29,8 @@ const Navbar = () =>{
             <a href="FuelQuoteHistory">
               <li>Fuel Quote History</li>
             </a>
+            {user && (<div className ="flex gap-6"><span>{user.username}</span> <button onClick={handleClick}>Logout</button>
+              </div>)}
           </ul>
         </div>
       );

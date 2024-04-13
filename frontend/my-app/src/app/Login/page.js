@@ -1,13 +1,46 @@
 "use client";
+import { useRouter } from "next/navigation";
+
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { useAuthContext } from "../hooks/useAuthContext";
+
 export default function Login() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const {dispatch} = useAuthContext()
+  const { push } = useRouter();
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     console.log(username, password)
-    
+    const profileData = {username, password};
+
+    try {
+      const response = await fetch('http://localhost:4000/api/login/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create profile. Please try again.');
+      }
+
+      const data = await response.json();
+      console.log('Profile created successfully:', data);
+      localStorage.setItem("user", JSON.stringify(data.username));
+      dispatch({type:"LOGIN", payload: data})
+      alert('Profile saved successfully');
+      push("/");
+
+
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please check the console for more information.');
+    }
   }
   return (
     <div>

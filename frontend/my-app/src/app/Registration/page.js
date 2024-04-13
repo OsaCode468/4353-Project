@@ -1,9 +1,16 @@
 "use client";
+import { useRouter } from "next/navigation";
+
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { useAuthContext } from "../hooks/useAuthContext";
+
 export default function Register() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const {dispatch} = useAuthContext()
+  const { push } = useRouter();
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     console.log(username, password)
@@ -24,7 +31,12 @@ export default function Register() {
 
       const data = await response.json();
       console.log('Profile created successfully:', data);
+      localStorage.setItem("user", JSON.stringify(data.username));
+      dispatch({type:"LOGIN", payload: data})
       alert('Profile saved successfully');
+      push("/");
+
+
     } catch (error) {
       console.error('Error saving profile:', error);
       alert('Error saving profile. Please check the console for more information.');
