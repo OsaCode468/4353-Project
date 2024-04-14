@@ -11,7 +11,6 @@ const FuelQuoteForm = () => {
     const [formSubmitted, setFormSubmitted] = useState(false);
 
     useEffect(() => {
-        // Fetch delivery address from backend when component mounts
         const fetchDeliveryAddress = async () => {
             try {
                 const response = await fetch('http://localhost:4000/api/fuelquotemodule/deliveryAddress/1');
