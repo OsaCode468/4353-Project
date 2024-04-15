@@ -31,6 +31,7 @@ router.post('/', async (req, res) => {
     const client = await db.connect()
     const { gallons, deliveryDate, deliveryAddress, userName } = req.body;
     console.log(userName)
+    //ADD DELIVERY ADDRESS QUERY
     if (!gallons || isNaN(gallons)) {
         return res.status(400).json({ error: 'Gallons requested must be a numeric value' });
     }

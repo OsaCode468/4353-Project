@@ -4,10 +4,11 @@ CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) NOT NULL,
         password VARCHAR(255) NOT NULL
-      )
+      );
       /* in client_profiles create a foreign key that references users(id)*/ 
 CREATE TABLE IF NOT EXISTS client_profiles (
     id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
     full_name VARCHAR(50) NOT NULL,
     address1 VARCHAR(100) NOT NULL,
     address2 VARCHAR(100),
