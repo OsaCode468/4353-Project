@@ -8,56 +8,34 @@ import {useRouter} from "next/navigation"
 
 const FuelQuoteForm = () => {
     const { push } = useRouter();
-    const {user} = useAuthContext();
-    console.log(user, "wjhdfiaoskd")
-    // if (!user) {
-    //     push("/Login")
-    //   }
     const [gallons, setGallons] = useState("");
     const [deliveryAddress, setDeliveryAddress] = useState("");
     const [deliveryDate, setDeliveryDate] = useState("");
     const [priceG, setPriceG] = useState("");
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [username, setUsername] = useState("")
+    const [redirectToLogin, setRedirectToLogin] = useState(false);
+    const {user} = useAuthContext();
+    useEffect(() => {
+        if (!user) {
+            // If user is not logged in and loading is finished, set timer to redirect to login page
+            const timer = setTimeout(() => {
+                setRedirectToLogin(true);
+            }, 1000); // 3 seconds
+            return () => clearTimeout(timer); // Cleanup timer on component unmount
+        }
+    }, [user]); // Trigger effect when user or isLoading changes
 
     useEffect(() => {
-        // Fetch delivery address from backend when component mounts
-        // const fetchDeliveryAddress = async () => {
-        //     setUsername(user.username)
-        //     try {
-        //         const response = await fetch(`http://localhost:4000/api/fuelquotemodule/${username}`);
-        //         if (!response.ok) {
-        //             throw new Error('Failed to fetch data');
-        //         }
-        //         const data = await response.json();
-        //         console.log(data)
-        //     } catch (error) {
-        //         console.error('Error fetching delivery address:', error);
-        //     }
-        // };
-
-        // const fetchPricePerGallon = async () => {
-        //     try {
-                
-        //         const response = await fetch('http://localhost:4000/api/pricing/pricePerGallon/1');
-        //         if (!response.ok) {
-        //             throw new Error('Failed to fetch delivery address');
-        //         }
-        //         const data = await response.json();
-        //         setPriceG(data.pricePerGallon[0].price_per_gallon)
-        //     } catch (error) {
-        //         console.error('Error fetching delivery address:', error);
-        //     }
-        // };
-
-        // fetchDeliveryAddress();
-        // fetchPricePerGallon();
-    }, []);
+        if (redirectToLogin) {
+            push("/Login");
+        }
+    }, [redirectToLogin]); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(user)
-        const userName = user
+        const userName = user.username
         const formData = {
             gallons,
             deliveryAddress,

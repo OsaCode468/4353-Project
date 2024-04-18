@@ -30,7 +30,7 @@ export default function Login() {
 
       const data = await response.json();
       console.log('Profile created successfully:', data);
-      localStorage.setItem("user", JSON.stringify(data.username));
+      localStorage.setItem("user", JSON.stringify(data));
       dispatch({type:"LOGIN", payload: data})
       alert('Profile saved successfully');
       push("/");
