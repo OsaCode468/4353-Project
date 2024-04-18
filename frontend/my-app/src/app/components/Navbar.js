@@ -29,7 +29,7 @@ const Navbar = () =>{
             <a href="FuelQuoteHistory/">
               <li>Fuel Quote History</li>
             </a>
-            {user && (<div className ="flex gap-6"><span>{user.username ? user.username: user}</span> <button onClick={handleClick}>Logout</button>
+            {user && (<div className ="flex gap-6"><span>{user.username /*? user.username: user*/}</span> <button onClick={handleClick}>Logout</button>
               </div>)}
           </ul>
         </div>
