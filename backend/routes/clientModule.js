@@ -20,26 +20,33 @@ const validateClientProfile = (req, res, next) => {
   next();
 };
 
-// GET route to fetch all client profiles for a specific user
-router.get("/:user_id", async (req, res) => {
-  const { user_id } = req.params;
+// Helper function to get user_id from username
+const getUserIdFromUsername = async (username) => {
   const client = await pool.connect();
   try {
-    const result = await client.query("SELECT * FROM client_profiles WHERE user_id = $1", [user_id]);
-    res.json(result.rows);
+    const result = await client.query("SELECT id FROM users WHERE username = $1", [username]);
+    if (result.rows.length > 0) {
+      return result.rows[0].id;
+    } else {
+      return null;
+    }
   } catch (error) {
-    console.error("Error fetching profiles:", error);
-    res.status(500).json({ message: "Error fetching profiles" });
+    throw error;
   } finally {
     client.release();
   }
-});
+};
 
 // POST route to create a new client profile
 router.post("/", validateClientProfile, async (req, res) => {
-  const client = await pool.connect();
-  const { user_id, fullName, address1, address2, city, state, zipcode } = req.body;
+  const { username, fullName, address1, address2, city, state, zipcode } = req.body;
   try {
+    const user_id = await getUserIdFromUsername(username);
+    if (!user_id) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    
+    const client = await pool.connect();
     const result = await client.query(
       "INSERT INTO client_profiles (user_id, full_name, address1, address2, city, state, zipcode) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
       [user_id, fullName, address1, address2, city, state, zipcode]
@@ -48,17 +55,20 @@ router.post("/", validateClientProfile, async (req, res) => {
   } catch (error) {
     console.error("Error saving profile:", error);
     res.status(500).json({ message: "Error saving profile" });
-  } finally {
-    client.release();
   }
 });
 
 // PUT route to update an existing client profile
 router.put("/:id", validateClientProfile, async (req, res) => {
-  const client = await pool.connect();
   const { id } = req.params;
-  const { user_id, fullName, address1, address2, city, state, zipcode } = req.body;
+  const { username, fullName, address1, address2, city, state, zipcode } = req.body;
   try {
+    const user_id = await getUserIdFromUsername(username);
+    if (!user_id) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const client = await pool.connect();
     const result = await client.query(
       "UPDATE client_profiles SET full_name = $1, address1 = $2, address2 = $3, city = $4, state = $5, zipcode = $6 WHERE id = $7 AND user_id = $8 RETURNING *",
       [fullName, address1, address2, city, state, zipcode, id, user_id]
@@ -70,16 +80,20 @@ router.put("/:id", validateClientProfile, async (req, res) => {
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ message: "Error updating profile" });
-  } finally {
-    client.release();
   }
 });
 
 // DELETE route to delete a client profile
 router.delete("/:id", async (req, res) => {
-  const client = await pool.connect();
-  const { id, user_id } = req.params;
+  const { id } = req.params;
+  const { username } = req.body;
   try {
+    const user_id = await getUserIdFromUsername(username);
+    if (!user_id) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const client = await pool.connect();
     const result = await client.query("DELETE FROM client_profiles WHERE id = $1 AND user_id = $2 RETURNING *", [id, user_id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Profile not found or does not belong to the user." });
@@ -88,11 +102,10 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting profile:", error);
     res.status(500).json({ message: "Error deleting profile" });
-  } finally {
-    client.release();
   }
 });
 
 module.exports = router;
+
 
 
