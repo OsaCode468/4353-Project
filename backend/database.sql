@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS fuelquotes (
     total_amount_due DECIMAL NOT NULL
 );
 
+--this is dummy data that can be inserted into the database
 INSERT INTO users (id, username, password)
 VALUES
     (1, 'username', 'password');

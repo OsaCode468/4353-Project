@@ -9,7 +9,6 @@ router.get("/getID/:username", async (req, res) => {
     const query = 'SELECT id FROM users WHERE username = $1';
     const result = await client.query(query, [username]);
     const id = result.rows[0].id;
-    //console.log(id);
 
     client.release();
 
