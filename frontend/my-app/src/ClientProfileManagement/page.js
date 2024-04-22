@@ -9,7 +9,6 @@ const ClientProfileManagement = () => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zipcode, setZipcode] = useState("");
-
   const { user } = useAuthContext(); // Get the user object from the Auth context
 
   const handleSubmit = async (e) => {
@@ -46,14 +45,6 @@ const ClientProfileManagement = () => {
     }
   };
 
-  // Placeholder array for states
-  const statesArray = [
-    { code: "TX", name: "Texas" },
-    { code: "CA", name: "California" },
-    { code: "NY", name: "New York" },
-    //Can add other states as needed
-  ];
-
   return (
     <div>
       <Navbar />
@@ -68,9 +59,7 @@ const ClientProfileManagement = () => {
               <input
                 id="full-name"
                 type="text"
-                placeholder="Raj Singh"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                maxLength="50"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -86,9 +75,7 @@ const ClientProfileManagement = () => {
               <input
                 id="address-1"
                 type="text"
-                placeholder="4302 University Drive"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                maxLength="100"
                 required
                 value={address1}
                 onChange={(e) => setAddress1(e.target.value)}
@@ -104,9 +91,7 @@ const ClientProfileManagement = () => {
               <input
                 id="address-2"
                 type="text"
-                placeholder="Room 203"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                maxLength="100"
                 value={address2}
                 onChange={(e) => setAddress2(e.target.value)}
               />
@@ -121,9 +106,7 @@ const ClientProfileManagement = () => {
               <input
                 id="city"
                 type="text"
-                placeholder="Houston"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                maxLength="100"
                 required
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
@@ -145,11 +128,7 @@ const ClientProfileManagement = () => {
                   onChange={(e) => setState(e.target.value)}
                 >
                   <option value="">Select a state</option>
-                  {statesArray.map((stateOption) => (
-                    <option key={stateOption.code} value={stateOption.code}>
-                      {stateOption.name}
-                    </option>
-                  ))}
+                  {/* Your state options here */}
                 </select>
               </div>
             </div>
@@ -163,7 +142,6 @@ const ClientProfileManagement = () => {
               <input
                 id="zipcode"
                 type="text"
-                placeholder="77204"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 pattern="\d{5}(-\d{4})?"
                 title="Enter a 5 or 9 digit zipcode"
@@ -191,4 +169,5 @@ const ClientProfileManagement = () => {
 }
 
 export default ClientProfileManagement;
+
 
