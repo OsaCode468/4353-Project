@@ -20,6 +20,37 @@ const validateClientProfile = (req, res, next) => {
   next();
 };
 
+
+// Register a new user
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: "Both username and password are required." });
+  }
+
+  const client = await pool.connect();
+  try {
+    // Check if user already exists
+    const exists = await client.query("SELECT 1 FROM users WHERE username = $1", [username]);
+    if (exists.rows.length > 0) {
+      return res.status(409).json({ message: "Username already taken." });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insert new user
+    await client.query("INSERT INTO users (username, password) VALUES ($1, $2)", [username, hashedPassword]);
+    res.status(201).json({ message: "User registered successfully." });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ message: "Error registering user" });
+  } finally {
+    client.release();
+  }
+});
+
 // Helper function to get user_id from username
 const getUserIdFromUsername = async (username) => {
   const client = await pool.connect();
