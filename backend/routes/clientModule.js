@@ -102,7 +102,7 @@ router.put('/:userId', validateClientProfile, async (req, res) => {
 // Delete a client profile
 router.delete('/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId);
-    the client = await pool.connect();
+    const client = await pool.connect();
     try {
         const result = await client.query('DELETE FROM client_profiles WHERE user_id = $1 RETURNING *', [userId]);
         if (result.rows.length === 0) {
