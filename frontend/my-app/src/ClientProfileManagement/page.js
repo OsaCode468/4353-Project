@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from "../components/Navbar";
+import { useAuthContext } from "../hooks/useAuthContext"; // Import useAuthContext
 
 const ClientProfileManagement = () => {
   const [fullName, setFullName] = useState("");
@@ -9,9 +10,19 @@ const ClientProfileManagement = () => {
   const [state, setState] = useState("");
   const [zipcode, setZipcode] = useState("");
 
+  const { user } = useAuthContext(); // Get the user object from the Auth context
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const profileData = { fullName, address1, address2, city, state, zipcode };
+    const profileData = {
+      fullName,
+      address1,
+      address2,
+      city,
+      state,
+      zipcode,
+      username: user.username // Include the username in the profile data
+    };
 
     try {
       const response = await fetch('/api/clientmodule/', {
@@ -35,7 +46,6 @@ const ClientProfileManagement = () => {
     }
   };
 
-
   // Placeholder array for states
   const statesArray = [
     { code: "TX", name: "Texas" },
@@ -56,7 +66,6 @@ const ClientProfileManagement = () => {
                 Full Name
               </label>
               <input
-              //(50 characters, required)
                 id="full-name"
                 type="text"
                 placeholder="Raj Singh"
@@ -75,7 +84,6 @@ const ClientProfileManagement = () => {
                 Address 1
               </label>
               <input
-              //(100 characters, required)
                 id="address-1"
                 type="text"
                 placeholder="4302 University Drive"
@@ -94,13 +102,11 @@ const ClientProfileManagement = () => {
                 Address 2
               </label>
               <input
-              //(100 characters, optional**
                 id="address-2"
                 type="text"
                 placeholder="Room 203"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 maxLength="100"
-                //NOT REQUIRED!!!
                 value={address2}
                 onChange={(e) => setAddress2(e.target.value)}
               />
@@ -113,7 +119,6 @@ const ClientProfileManagement = () => {
                 City
               </label>
               <input
-              //(100 characters, required)
                 id="city"
                 type="text"
                 placeholder="Houston"
@@ -133,7 +138,6 @@ const ClientProfileManagement = () => {
               </label>
               <div className="relative">
                 <select
-                //(Drop Down, selection required) DB will store 2 character state code
                   id="state"
                   className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   required
@@ -157,13 +161,11 @@ const ClientProfileManagement = () => {
                 Zipcode
               </label>
               <input
-              //(9 characters, at least 5 character code required)
                 id="zipcode"
                 type="text"
                 placeholder="77204"
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 pattern="\d{5}(-\d{4})?"
-                //AT LEAST 5, NO MORE THAN 9 DIGITS FOR ZIPCODE
                 title="Enter a 5 or 9 digit zipcode"
                 required
                 value={zipcode}
@@ -189,3 +191,4 @@ const ClientProfileManagement = () => {
 }
 
 export default ClientProfileManagement;
+
