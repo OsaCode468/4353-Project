@@ -5,6 +5,7 @@ const pool = require("../connection");
 // Middleware for validation
 const validateClientProfile = (req, res, next) => {
   const { fullName, address1, city, state, zipcode } = req.body;
+  console.log(state)
   let errors = [];
 
   if (!fullName || fullName.length > 50) errors.push("Full name must be between 1 and 50 characters long.");
@@ -15,6 +16,7 @@ const validateClientProfile = (req, res, next) => {
   if (!zipcode) errors.push("Zipcode must be a valid 5 or 9 digit code.");
 
   if (errors.length > 0) {
+    console.log(errors)
     return res.status(400).json({ message: "Validation error in one or more fields.", errors });
   }
   next();
