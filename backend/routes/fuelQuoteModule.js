@@ -4,6 +4,8 @@ const router = express.Router();
 // const pg = new Pricing();
 const db = require('../connection'); // Import your database connection 
 
+const addyAndState = [];
+
 // Assumming there is a function in the database module to fetch the delivery address
 router.get('/:username', async (req, res) => {
     try {
@@ -20,6 +22,112 @@ router.get('/:username', async (req, res) => {
     } catch (error) {
         console.error('Error fetching data:', error);
         throw new Error('Failed to fetch data from the database');
+    }
+})
+// router.get("/getID/:username", async (req, res) => {
+//     try {
+//         const username = req.params.username;
+//         const client = await db.connect();
+//         const query = 'SELECT id FROM users WHERE username = $1';
+//         const result = await client.query(query, [username]);
+//         if (result.rows.length === 0) {
+//             client.release();
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+//         const id = result.rows[0].id;
+
+//         const addressQuery = 'SELECT address1, state FROM client_profiles WHERE user_id = $1';
+//         const addressResult = await client.query(addressQuery, [id]);
+//         if (addressResult.rows.length === 0) {
+//             client.release();
+//             return res.status(404).json({ error: 'Address not found for user' });
+//         }
+
+//         // Add address and state to the global array
+//         addyAndState.push({
+//             address: addressResult.rows[0].address1,
+//             state: addressResult.rows[0].state
+//         });
+
+//         client.release();
+
+//         // Optionally send the array back in the response or just the latest entry
+//         res.status(200).json(addyAndState[addyAndState.length - 1]);
+//     } catch (error) {
+//         console.error('Error retrieving user details:', error);
+//         if (client) {
+//             client.release();
+//         }
+//         res.status(500).send('Internal Server Error');
+//     }
+// });
+
+// console.log(addyAndState)
+
+// router.get("/getID/:username", async (req, res) => {
+//     try {
+//         const username = req.params.username;
+//         const client = await db.connect();
+
+//         // Query to get user ID based on username
+//         const query = 'SELECT id FROM users WHERE username = $1';
+//         const result = await client.query(query, [username]);
+//         if (result.rows.length === 0) {
+//             client.release();
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+//         const userId = result.rows[0].id;
+
+//         // Query to get address details from client_profiles table
+//         const addressQuery = 'SELECT address1, state FROM client_profiles WHERE user_id = $1';
+//         const addressResult = await client.query(addressQuery, [userId]);
+//         if (addressResult.rows.length === 0) {
+//             client.release();
+//             return res.status(404).json({ error: 'Address not found for user' });
+//         }
+
+//         // Store 'address1' and 'state' in variables
+//         const userAddress = addressResult.rows[0].address1;
+//         const userState = addressResult.rows[0].state;
+
+//         console.log("hello", userAddress, userState)
+
+//         // Release the client after usage
+//         client.release();
+
+//         // Now you can use 'userAddress' and 'userState' as needed
+//         res.status(200).json({
+//             address: userAddress,
+//             state: userState
+//         });
+
+//     } catch (error) {
+//         console.log('Error retrieving user details:', error);
+//         if (client) {
+//             client.release();
+//         }
+//         res.status(500).send('Internal Server Error');
+//     }
+
+// });
+
+router.get("/getID/:username", async (req, res) => {
+    try {
+        const username = req.params.username;
+        const client = await db.connect();
+        const query = 'SELECT id FROM users WHERE username = $1';
+        const result = await client.query(query, [username]);
+        const id = result.rows[0].id;
+        const address = 'SELECT address1, state FROM client_profiles WHERE user_id = $1';
+        const ress = await client.query(address, [id]);
+        //console.log(id);
+
+        client.release();
+
+        res.status(200).json({ 'add': ress.rows[0].address1, 'stat': ress.rows[0].state });
+    } catch (error) {
+        console.log('Error retrieving id:', error);
+        res.status(500).send('Internal Server Error');
     }
 })
 

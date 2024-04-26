@@ -26,7 +26,7 @@ const pool = require("../connection")
 
 
 router.post('/', async (req, res) => {
-    const client = await db.connect()
+    const client = await pool.connect()
     const { gallons, deliveryDate, deliveryAddress, userName } = req.body;
     console.log(gallons, userName)
     const gallonsNumber = parseFloat(gallons);
@@ -48,8 +48,32 @@ router.post('/', async (req, res) => {
         // const deliveryAddress = await getDeliveryAddressFromDatabase();
 
         // Calculate total price and get price per gallon
-        const totalPrice = 10;
-        const ppg = 8;
+        const companyProfit = .1
+        let statistics = deliveryAddress.slice(-2)
+        let locationFactor
+        if (statistics === 'TX') {
+            locationFactor = 0.02
+        } else {
+            locationFactor = 0.04
+        }
+        let galRequestedFactor
+        console.log(gallonsNumber)
+        if (1000 < gallonsNumber) {
+            galRequestedFactor = 0.02
+        } else {
+            galRequestedFactor = 0.03
+        }
+        console.log(deliveryAddress.slice(-2), locationFactor, galRequestedFactor)
+        // if() {
+
+        // }
+
+        let margin = ((1.5) * (companyProfit + locationFactor + galRequestedFactor))
+        const ppg = 1.5 + margin;
+        const totalPrice = (gallonsNumber * parseFloat(ppg)).toFixed(2); // Assuming priceG is a string, parse it to float
+
+        // const totalPrice = ppg * gallonsNumber;
+
 
         const postQuery = await client.query('insert into fuelquotes(user_id, gallons_requested, delivery_address, delivery_date, price_per_gallon, total_amount_due) values($1,$2,$3,$4,$5,$6)', [id, gallons, deliveryAddress, deliveryDate, ppg, totalPrice])
         // Construct the fuel quote object
@@ -58,12 +82,23 @@ router.post('/', async (req, res) => {
         // console.log(fuelQuote);
 
         // Send the fuel quote response to the frontend
-        res.status(200).json({ message: 'Fuel quote saved successfully' });
+        // res.status(200).json({ message: 'Fuel quote saved successfully' });
+        res.status(200).json({
+            ppg: ppg,
+            totalAmountDue: totalPrice
+        });
     } catch (error) {
         console.error('Error saving fuel quote:', error);
         res.status(500).json({ 'error': error });
     }
 });
+
+
+
+
+
+
+
 
 router.get("/getID/:username", async (req, res) => {
     try {
@@ -96,42 +131,42 @@ router.get("/getID/:username", async (req, res) => {
 
 
 
-router.get("/checkCustomer/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-        const client = await pool.connect();
-        const query = 'SELECT COUNT(*) FROM fuelquotes WHERE user_id = $1';
-        const result = await client.query(query, [id]);
+// router.get("/checkCustomer/:id", async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const client = await pool.connect();
+//         const query = 'SELECT COUNT(*) FROM fuelquotes WHERE user_id = $1';
+//         const result = await client.query(query, [id]);
 
-        //console.log(result.rows[0].count);
-        const count = result.rows[0].count
+//         //console.log(result.rows[0].count);
+//         const count = result.rows[0].count
 
-        client.release();
+//         client.release();
 
-        res.status(200).send({ mssg: "Got count", count });
-    } catch (error) {
-        console.log('Error retrieving previous customer history:', error);
-        res.status(500).send('Internal Server Error');
-    }
-})
+//         res.status(200).send({ mssg: "Got count", count });
+//     } catch (error) {
+//         console.log('Error retrieving previous customer history:', error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// })
 
-router.get("/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-        const client = await pool.connect();
-        const query = 'SELECT * FROM fuelquotes WHERE user_id = $1';
-        const result = await client.query(query, [id]);
-        const fuelQuoteHistoryData = result.rows;
-        //console.log(fuelQuoteHistoryData);
+// router.get("/:id", async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         const client = await pool.connect();
+//         const query = 'SELECT * FROM fuelquotes WHERE user_id = $1';
+//         const result = await client.query(query, [id]);
+//         const fuelQuoteHistoryData = result.rows;
+//         //console.log(fuelQuoteHistoryData);
 
-        client.release();
+//         client.release();
 
-        res.status(200).send({ mssg: "Get all fuel quote history", fuelQuoteHistoryData });
-    } catch (error) {
-        console.log('Error retrieving fuel quote history:', error);
-        res.status(500).send('Internal Server Error');
-    }
-})
+//         res.status(200).send({ mssg: "Get all fuel quote history", fuelQuoteHistoryData });
+//     } catch (error) {
+//         console.log('Error retrieving fuel quote history:', error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// })
 
 module.exports = router
 

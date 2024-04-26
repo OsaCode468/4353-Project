@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS client_profiles (
 CREATE TABLE IF NOT EXISTS fuelquotes (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id),
-    gallons_requested INT NOT NULL,
+    gallons_requested DECIMAL NOT NULL,
     delivery_address TEXT NOT NULL,
     delivery_date DATE NOT NULL,
     price_per_gallon DECIMAL NOT NULL,
