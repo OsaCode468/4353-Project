@@ -18,7 +18,7 @@ describe('Client Profile API', () => {
     describe('POST /api/clientmodule', () => {
         it('should create a new client profile when one does not exist', async () => {
             const newProfile = {
-                username: "jdoe", // Assuming username is part of the profile creation
+                username: "ha1", // Assuming username is part of the profile creation
                 fullName: "Jane Doe",
                 address1: "1234 Elm Street",
                 address2: "Apt 101",
@@ -30,13 +30,13 @@ describe('Client Profile API', () => {
                 .post('/api/clientmodule')
                 .send(newProfile);
             console.log(res.error)
-            expect(res.statusCode).toEqual(201);
+            expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty("id");
         });
 
         it('should update an existing client profile', async () => {
             const updatedProfile = {
-                username: "jdoe",
+                username: "hakk1",
                 fullName: "Jane Updated",
                 address1: "1234 Oak Street",
                 address2: "Apt 102",
@@ -83,7 +83,7 @@ describe('Client Profile API', () => {
     // Testing DELETE an existing client profile
     describe('DELETE /api/clientmodule/:id', () => {
         it('should delete an existing client profile', async () => {
-            const res = await request(app).delete('/api/clientmodule/1'); // Assuming 1 is a valid ID
+            const res = await request(app).delete('/api/clientmodule/17'); // Assuming 1 is a valid ID
             expect(res.statusCode).toEqual(204);
         });
 

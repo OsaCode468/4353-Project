@@ -21,7 +21,7 @@ router.get('/:username', async (req, res) => {
         return res.status(200).json({ "data": q.rows });
     } catch (error) {
         console.error('Error fetching data:', error);
-        throw new Error('Failed to fetch data from the database');
+        return res.status(400).json({"error":'Failed to fetch data from the database'});
     }
 })
 // router.get("/getID/:username", async (req, res) => {

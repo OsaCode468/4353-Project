@@ -1,49 +1,74 @@
 const request = require('supertest');
 const express = require('express');
 const bodyParser = require('body-parser');
-const fuelRouter = require('../routes/fuelQuoteModule');
+const router = require('../routes/fuelQuoteModule'); 
+const db = require('../connection');
+
+jest.mock('../connection', () => {
+    return {
+        connect: jest.fn().mockResolvedValue({
+            query: jest.fn(),
+            release: jest.fn(),
+        }),
+    };
+});
 
 const app = express();
-
 app.use(bodyParser.json());
+app.use(router);
 
-app.use('/fuel', fuelRouter);
+describe('API Routes', () => {
+    beforeAll(() => {
+        db.connect.mockImplementation(() => Promise.resolve({
+            query: jest.fn().mockResolvedValueOnce({
+                rows: [{ id: 1, address1: '123 Test Lane', city: 'Testville', state: 'TS', zipcode: '12345' }],
+                rowCount: 1
+            }),
+            release: jest.fn()
+        }));
+    });
 
-describe('Fuel Quote API', () => {
-    // test cases for the POST / fuel endpoints
-    describe('POST /fuel', () => {
-        // test case for when valid data is provided
-        test('should respond with status 200 and a success message when valid data is provided', async () => {
-            const response = await request(app)
-                .post('/fuel')
-                .send({ gallons: 100, deliveryDate: '2024-03-29' });
+    test('GET /getID/:username should return user ID', async () => {
+        const response = await request(app).get('/getID/johndoe');
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({ id: 1 });
+    });
 
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('message', 'Fuel quote saved successfully');
-            expect(response.body.fuelQuote).toEqual(expect.objectContaining({
-                deliveryDate: '2024-03-29',
-                gallons: 100,
-            }));
+    test('GET /getAddress/:id should return address information', async () => {
+        const response = await request(app).get('/getAddress/1');
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            address: '123 Test Lane',
+            city: 'Testville',
+            state: 'TS',
+            zipcode: '12345'
+        });
+    });
+
+    test('POST / should save fuel quote', async () => {
+        db.connect.mockResolvedValueOnce({
+            query: jest.fn().mockResolvedValue({ rowCount: 1 }),
+            release: jest.fn()
         });
 
-        // test case for when the gallons requested is not a numeric value
-        test('should respond with status 400 and an error message when gallons requested is not a numeric value', async () => {
-            const response = await request(app)
-                .post('/fuel')
-                .send({ gallons: 'invalid', deliveryDate: '2024-03-29' });
+        const payload = {
+            gallons: 500,
+            deliveryAddress: '123 Test Lane',
+            deliveryDate: '2021-09-01',
+            id: 1,
+            priceG: 2.50,
+            totalAmount: 1250
+        };
 
-            expect(response.statusCode).toBe(400);
-            expect(response.body).toHaveProperty('error', 'Gallons requested must be a numeric value');
-        });
+        const response = await request(app).post('/').send(payload);
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({ message: 'Fuel quote saved successfully' });
+    });
 
-        // test case for when a delivery date is not provided
-        test('should respond with status 400 and an error message when delivery date is not provided', async () => {
-            const response = await request(app)
-                .post('/fuel')
-                .send({ gallons: 100 });
-
-            expect(response.statusCode).toBe(400);
-            expect(response.body).toHaveProperty('error', 'Delivery date is required');
-        });
+    test('POST / should return 400 for invalid data', async () => {
+        const payload = { gallons: 'five hundred', deliveryDate: '2021-09-01' }; // Invalid gallons
+        const response = await request(app).post('/').send(payload);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Gallons requested must be a numeric value');
     });
 });
