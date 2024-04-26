@@ -4,6 +4,124 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 
+const pool = require('../connection');
+const clientModuleRoutes = require('../routes/clientModule');
+app.use('/api/clientmodule', clientModuleRoutes);
+
+describe('Client Profile API', () => {
+    afterAll(async () => {
+        await pool.end();  
+    });
+
+    // Testing POST endpoint to create or update a client profile
+    describe('POST /api/clientmodule', () => {
+        it('should create a new client profile when one does not exist', async () => {
+            const newProfile = {
+                username: "jdoe", // Assuming username is part of the profile creation
+                fullName: "Jane Doe",
+                address1: "1234 Elm Street",
+                address2: "Apt 101",
+                city: "Springfield",
+                state: "IL",
+                zipcode: "62704"
+            };
+            const res = await request(app)
+                .post('/api/clientmodule')
+                .send(newProfile);
+            expect(res.statusCode).toEqual(201);
+            expect(res.body).toHaveProperty("id");
+        });
+
+        it('should update an existing client profile', async () => {
+            const updatedProfile = {
+                username: "jdoe",
+                fullName: "Jane Updated",
+                address1: "1234 Oak Street",
+                address2: "Apt 102",
+                city: "Springfield",
+                state: "IL",
+                zipcode: "62705"
+            };
+            const res = await request(app)
+                .post('/api/clientmodule')
+                .send(updatedProfile);
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toHaveProperty("full_name", "Jane Updated");  // Validate against actual DB schema names
+        });
+
+        it('should handle validation errors for missing fields', async () => {
+            const incompleteProfile = {
+                username: "jdoe"
+                // Missing other required fields
+            };
+            const res = await request(app)
+                .post('/api/clientmodule')
+                .send(incompleteProfile);
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toHaveProperty("errors");
+        });
+
+        it('should return 404 when the username does not exist', async () => {
+            const profileWithInvalidUser = {
+                username: "nonexistent",
+                fullName: "No One",
+                address1: "0000 Nowhere",
+                address2: "Apt 000",
+                city: "Nowhere",
+                state: "ZZ",
+                zipcode: "00000"
+            };
+            const res = await request(app)
+                .post('/api/clientmodule')
+                .send(profileWithInvalidUser);
+            expect(res.statusCode).toEqual(404);
+        });
+    });
+
+    // Testing DELETE an existing client profile
+    describe('DELETE /api/clientmodule/:id', () => {
+        it('should delete an existing client profile', async () => {
+            const res = await request(app).delete('/api/clientmodule/1'); // Assuming 1 is a valid ID
+            expect(res.statusCode).toEqual(204);
+        });
+
+        it('should return 404 for a non-existing profile id', async () => {
+            const res = await request(app).delete('/api/clientmodule/9999');
+            expect(res.statusCode).toEqual(404);
+            expect(res.body).toHaveProperty("message", "Profile not found or does not belong to the user.");
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+const request = require('supertest');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+app.use(bodyParser.json());
+
 
 const pool = require('../connection');
 
@@ -135,3 +253,5 @@ describe('PUT /api/clientmodule/:id', () => {
     });
 });
 });
+
+*/

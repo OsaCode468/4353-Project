@@ -3,19 +3,62 @@ import React, { useState, useEffect } from 'react';
 import TotAmount from "../components/TotAmount";
 import Navbar from "../components/Navbar";
 import { useAuthContext } from "../hooks/useAuthContext";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation"
 
 
 const FuelQuoteForm = () => {
     const { push } = useRouter();
     const [gallons, setGallons] = useState("");
     const [deliveryAddress, setDeliveryAddress] = useState("");
+    const [deliveryState, setDeliveryState] = useState("")
     const [deliveryDate, setDeliveryDate] = useState("");
     const [priceG, setPriceG] = useState("");
+    const [totalAmount, setTotalAmount] = useState('');
     const [formSubmitted, setFormSubmitted] = useState(false);
-    const [username, setUsername] = useState("")
+    //const [username, setUsername] = useState("")
+    const [id, setID] = useState(null);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
-    const {user} = useAuthContext();
+    const { user } = useAuthContext();
+    const username=user?.username;
+
+    useEffect(() => {
+        if (user && username) {
+            fetchID(username);
+        }
+        if(id){
+            fetchAddress(id);
+        }
+    }, [user, id]);
+
+    const fetchID = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/fuelquotemodule/getID/${username}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch the id. Please try again.');
+            }
+            const data = await response.json();
+            setID(data.id); // Assuming 'add' contains the delivery address
+            // You can also set other states here if needed, e.g., for state or other related data.
+        } catch (error) {
+            console.error('Error fetching id:', error);
+        }
+    };
+
+    const fetchAddress = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/fuelquotemodule/getAddress/${id}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch the address. Please try again.');
+            }
+            const data = await response.json();
+            setDeliveryAddress(data.address + ' ' + data.city + ', ' + data.state + ' ' + data.zipcode); // Assuming 'add' contains the delivery address
+            setDeliveryState(data.state);
+            // You can also set other states here if needed, e.g., for state or other related data.
+        } catch (error) {
+            console.error('Error fetching address:', error);
+        }
+    };
+
     useEffect(() => {
         if (!user) {
             // If user is not logged in and loading is finished, set timer to redirect to login page
@@ -30,18 +73,52 @@ const FuelQuoteForm = () => {
         if (redirectToLogin) {
             push("/Login");
         }
-    }, [redirectToLogin]); 
+    }, [redirectToLogin]);
+
+    const handleGetQuote = async (e) => {
+        // Call your pricing module endpoint
+        // Assume the endpoint returns an object with the suggested price and total amount
+        e.preventDefault();
+        const formData = {
+            gallons,
+            deliveryState,
+            id
+            // priceG
+        };
+
+        try {
+            const response = await fetch('http://localhost:4000/api/pricing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to get the quote. Please try again.');
+            }
+
+            const quoteData = await response.json();
+            setPriceG(quoteData.ppg)
+            setTotalAmount(quoteData.totalAmountDue)
+            setFormSubmitted(true);
+            // setSuggestedPrice(quoteData.suggestedPrice);
+            // setTotalAmount(quoteData.totalAmount);
+        } catch (error) {
+            console.error('Error getting quote:', error);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(user)
-        const userName = user.username
         const formData = {
             gallons,
             deliveryAddress,
             deliveryDate,
-            userName
-            // priceG
+            id,
+            priceG,
+            totalAmount
         };
 
         try {
@@ -57,7 +134,11 @@ const FuelQuoteForm = () => {
                 throw new Error('Failed to save fuel quote. Please try again.');
             }
 
-            setFormSubmitted(true);
+            if(response.ok){
+                alert("Fuel quote successfully ordered");
+            }
+
+            // setFormSubmitted(true);
             console.log('Fuel quote saved successfully');
         } catch (error) {
             console.error('Error saving fuel quote:', error);
@@ -69,7 +150,8 @@ const FuelQuoteForm = () => {
             <Navbar />
             <div id='farm' className="container mx-auto mt-10">
                 <h2 className="text-center text-2xl font-bold mb-5">Fuel Quote Form</h2>
-                <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto">
+                {/* changed handleSubmit to handleGetQuote */}
+                <form onSubmit={handleGetQuote} className="w-full max-w-lg mx-auto">
                     <div className="flex flex-wrap -mx-3 mb-6">
                         <div className="w-full px-3">
                             <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="full-name">
@@ -130,7 +212,6 @@ const FuelQuoteForm = () => {
                             <input
                                 id="city"
                                 type="number"
-                                placeholder="3.87"
                                 className="appearance-none block w-full bg-gray-500 text-white border border-gray-200 rounded py-3 px-4 leading-tight"
                                 readOnly
                                 maxLength="100"
@@ -154,13 +235,31 @@ const FuelQuoteForm = () => {
                     </div>
                 </form>
                 {formSubmitted &&
-                    <TotAmount
-                        gallons={gallons}
-                        deliveryAddress={deliveryAddress}
-                        deliveryDate={deliveryDate}
-                        priceG={priceG}
-                    />
+                    <>
+                        <TotAmount
+                            totalAmount={totalAmount}
+                        />
+                        <div className="text-center mt-4">
+                            <button
+                                type="button"
+                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                onClick={handleSubmit}
+                            >
+                                Submit Quote
+                            </button>
+                        </div>
+                    </>
                 }
+
+                {/* {formSubmitted &&
+                    <TotAmount
+                        totalAmount={totalAmount}
+                    // gallons={gallons}
+                    // deliveryAddress={deliveryAddress}
+                    // deliveryDate={deliveryDate}
+                    // priceG={priceG}
+                    />
+                } */}
             </div>
         </div>
     );
