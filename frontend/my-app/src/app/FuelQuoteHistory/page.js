@@ -2,33 +2,35 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import classes from "./page.module.css";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 function FuelQuoteHistory() {
+  const { user } = useAuthContext();
   const [initialRenderComplete, setInitialRenderComplete] = useState(false);
   const [quoteHistory, setQuoteHistory] = useState(null);
   const [id, setId] = useState(null);
   const [isPrevCustomer, setIsPrevCustomer] = useState(false);
 
-  const username = "username";
+  const username = user?.username;
 
   useEffect(() => {
-    const fetchID = async () => {
-      const response = await fetch(
-        `http://localhost:4000/api/fuelQuoteHistory/getID/${username}`
-      );
-      const json = await response.json();
-      console.log(json.id);
+    if (user) {
+      const fetchID = async () => {
+        const response = await fetch(
+          `http://localhost:4000/api/fuelQuoteHistory/getID/${username}`
+        );
+        const json = await response.json();
 
-      if (!response.ok) {
-        throw new Error("There was an error fetching data.");
-      }
-      if (response.ok) {
-        setId(json.id);
-      }
-    };
-
-    fetchID();
-  }, []);
+        if (!response.ok) {
+          throw new Error("There was an error fetching data.");
+        }
+        if (response.ok) {
+          setId(json.id);
+        }
+      };
+      fetchID();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (id) {
