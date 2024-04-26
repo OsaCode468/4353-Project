@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import TotAmount from "../components/TotAmount";
 import Navbar from "../components/Navbar";
 import { useAuthContext } from "../hooks/useAuthContext";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation"
 
 
 const FuelQuoteForm = () => {
@@ -12,10 +12,22 @@ const FuelQuoteForm = () => {
     const [deliveryAddress, setDeliveryAddress] = useState("");
     const [deliveryDate, setDeliveryDate] = useState("");
     const [priceG, setPriceG] = useState("");
+    const [totalAmount, setTotalAmount] = useState('');
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [username, setUsername] = useState("")
     const [redirectToLogin, setRedirectToLogin] = useState(false);
-    const {user} = useAuthContext();
+    const { user } = useAuthContext();
+
+
+
+
+
+
+
+
+
+
+
     useEffect(() => {
         if (!user) {
             // If user is not logged in and loading is finished, set timer to redirect to login page
@@ -30,7 +42,47 @@ const FuelQuoteForm = () => {
         if (redirectToLogin) {
             push("/Login");
         }
-    }, [redirectToLogin]); 
+    }, [redirectToLogin]);
+
+    const handleGetQuote = async (e) => {
+        // Call your pricing module endpoint
+        // Assume the endpoint returns an object with the suggested price and total amount
+        e.preventDefault();
+        console.log(user)
+        const userName = user.username
+        const formData = {
+            gallons,
+            deliveryAddress,
+            deliveryDate,
+            userName
+            // priceG
+        };
+        console.log(gallons,
+            deliveryAddress,
+            deliveryDate,
+            userName)
+
+        try {
+            const response = await fetch('http://localhost:4000/api/pricing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to get the quote. Please try again.');
+            }
+
+            const quoteData = await response.json();
+            // setSuggestedPrice(quoteData.suggestedPrice);
+            // setTotalAmount(quoteData.totalAmount);
+        } catch (error) {
+            console.error('Error getting quote:', error);
+        }
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -69,7 +121,8 @@ const FuelQuoteForm = () => {
             <Navbar />
             <div id='farm' className="container mx-auto mt-10">
                 <h2 className="text-center text-2xl font-bold mb-5">Fuel Quote Form</h2>
-                <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto">
+                {/* changed handleSubmit to handleGetQuote */}
+                <form onSubmit={handleGetQuote} className="w-full max-w-lg mx-auto">
                     <div className="flex flex-wrap -mx-3 mb-6">
                         <div className="w-full px-3">
                             <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="full-name">
