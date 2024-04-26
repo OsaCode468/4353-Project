@@ -6,6 +6,7 @@ app.use(bodyParser.json());
 
 const pool = require('../connection');
 const clientModuleRoutes = require('../routes/clientModule');
+
 app.use('/api/clientmodule', clientModuleRoutes);
 
 describe('Client Profile API', () => {
@@ -28,6 +29,7 @@ describe('Client Profile API', () => {
             const res = await request(app)
                 .post('/api/clientmodule')
                 .send(newProfile);
+            console.log(res.error)
             expect(res.statusCode).toEqual(201);
             expect(res.body).toHaveProperty("id");
         });
@@ -88,7 +90,7 @@ describe('Client Profile API', () => {
         it('should return 404 for a non-existing profile id', async () => {
             const res = await request(app).delete('/api/clientmodule/9999');
             expect(res.statusCode).toEqual(404);
-            expect(res.body).toHaveProperty("message", "Profile not found or does not belong to the user.");
+            expect(res.body).toHaveProperty("message", "User not found.");
         });
     });
 });
