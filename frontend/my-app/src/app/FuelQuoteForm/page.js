@@ -10,43 +10,54 @@ const FuelQuoteForm = () => {
     const { push } = useRouter();
     const [gallons, setGallons] = useState("");
     const [deliveryAddress, setDeliveryAddress] = useState("");
+    const [deliveryState, setDeliveryState] = useState("")
     const [deliveryDate, setDeliveryDate] = useState("");
     const [priceG, setPriceG] = useState("");
     const [totalAmount, setTotalAmount] = useState('');
     const [formSubmitted, setFormSubmitted] = useState(false);
-    const [username, setUsername] = useState("")
+    //const [username, setUsername] = useState("")
+    const [id, setID] = useState(null);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
     const { user } = useAuthContext();
+    const username=user?.username;
 
     useEffect(() => {
-        if (user && user.username) {
-            fetchAddress(user.username);
+        if (user && username) {
+            fetchID(username);
         }
-    }, [user]);
+        if(id){
+            fetchAddress(id);
+        }
+    }, [user, id]);
 
-
-
-
-
-    const fetchAddress = async (username) => {
+    const fetchID = async (username) => {
         try {
             const response = await fetch(`http://localhost:4000/api/fuelquotemodule/getID/${username}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch the id. Please try again.');
+            }
+            const data = await response.json();
+            setID(data.id); // Assuming 'add' contains the delivery address
+            // You can also set other states here if needed, e.g., for state or other related data.
+        } catch (error) {
+            console.error('Error fetching id:', error);
+        }
+    };
+
+    const fetchAddress = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/fuelquotemodule/getAddress/${id}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch the address. Please try again.');
             }
             const data = await response.json();
-            setDeliveryAddress(data.add + ', ' + data.stat); // Assuming 'add' contains the delivery address
+            setDeliveryAddress(data.address + ' ' + data.city + ', ' + data.state + ' ' + data.zipcode); // Assuming 'add' contains the delivery address
+            setDeliveryState(data.state);
             // You can also set other states here if needed, e.g., for state or other related data.
         } catch (error) {
             console.error('Error fetching address:', error);
         }
     };
-
-
-
-
-
-
 
     useEffect(() => {
         if (!user) {
@@ -68,19 +79,12 @@ const FuelQuoteForm = () => {
         // Call your pricing module endpoint
         // Assume the endpoint returns an object with the suggested price and total amount
         e.preventDefault();
-        console.log(user)
-        const userName = user.username
         const formData = {
             gallons,
-            deliveryAddress,
-            deliveryDate,
-            userName
+            deliveryState,
+            id
             // priceG
         };
-        console.log(gallons,
-            deliveryAddress,
-            deliveryDate,
-            userName)
 
         try {
             const response = await fetch('http://localhost:4000/api/pricing', {
@@ -96,7 +100,6 @@ const FuelQuoteForm = () => {
             }
 
             const quoteData = await response.json();
-            console.log(quoteData.ppg, quoteData.totalAmountDue)
             setPriceG(quoteData.ppg)
             setTotalAmount(quoteData.totalAmountDue)
             setFormSubmitted(true);
@@ -107,17 +110,15 @@ const FuelQuoteForm = () => {
         }
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(user)
-        const userName = user.username
         const formData = {
             gallons,
             deliveryAddress,
             deliveryDate,
-            userName
-            // priceG
+            id,
+            priceG,
+            totalAmount
         };
 
         try {
@@ -131,6 +132,10 @@ const FuelQuoteForm = () => {
 
             if (!response.ok) {
                 throw new Error('Failed to save fuel quote. Please try again.');
+            }
+
+            if(response.ok){
+                alert("Fuel quote successfully ordered");
             }
 
             // setFormSubmitted(true);
@@ -207,7 +212,6 @@ const FuelQuoteForm = () => {
                             <input
                                 id="city"
                                 type="number"
-                                placeholder="3.87"
                                 className="appearance-none block w-full bg-gray-500 text-white border border-gray-200 rounded py-3 px-4 leading-tight"
                                 readOnly
                                 maxLength="100"

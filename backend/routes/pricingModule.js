@@ -21,61 +21,33 @@ const pool = require("../connection")
 // });
 
 
-
-
-
-
 router.post('/', async (req, res) => {
     const client = await pool.connect()
-    const { gallons, deliveryDate, deliveryAddress, userName } = req.body;
-    console.log(gallons, userName)
+    const { gallons, deliveryState, id } = req.body;
     const gallonsNumber = parseFloat(gallons);
     //ADD DELIVERY ADDRESS QUERY
     if (!gallonsNumber || isNaN(gallonsNumber)) {
         return res.status(400).json({ error: 'Gallons requested must be a numeric value' });
     }
 
-    if (!deliveryDate) {
-        return res.status(400).json({ error: 'Delivery date is required' });
-    }
+    const companyProfit = 0.10;
+    const locationFactor = (deliveryState==='TX' ? 0.02 : 0.04)
+    const gallonsFactor = (gallonsNumber >= 1000 ? 0.02 : 0.03)
 
     try {
-        const q = await client.query('SELECT id from users where username = $1', [userName])
-        console.log("this is the " + q)
-        const id = q.rows[0].id
-        console.log(id)
-        // Fetch delivery address from the database
-        // const deliveryAddress = await getDeliveryAddressFromDatabase();
+        const query = 'SELECT COUNT(*) FROM fuelquotes WHERE user_id = $1';
+        const result = await client.query(query, [id]);
+        const count = result.rows[0].count;
+        const rHistoryFactor = (count>0 ? 0.01 :  0.00)
 
-        // Calculate total price and get price per gallon
-        const companyProfit = .1
-        let statistics = deliveryAddress.slice(-2)
-        let locationFactor
-        if (statistics === 'TX') {
-            locationFactor = 0.02
-        } else {
-            locationFactor = 0.04
-        }
-        let galRequestedFactor
-        console.log(gallonsNumber)
-        if (1000 < gallonsNumber) {
-            galRequestedFactor = 0.02
-        } else {
-            galRequestedFactor = 0.03
-        }
-        console.log(deliveryAddress.slice(-2), locationFactor, galRequestedFactor)
-        // if() {
+        console.log(locationFactor, rHistoryFactor, gallonsFactor, companyProfit)
 
-        // }
-
-        let margin = ((1.5) * (companyProfit + locationFactor + galRequestedFactor))
+        const margin = ((1.5) * (locationFactor - rHistoryFactor + gallonsFactor + companyProfit))
         const ppg = 1.5 + margin;
         const totalPrice = (gallonsNumber * parseFloat(ppg)).toFixed(2); // Assuming priceG is a string, parse it to float
 
-        // const totalPrice = ppg * gallonsNumber;
 
-
-        const postQuery = await client.query('insert into fuelquotes(user_id, gallons_requested, delivery_address, delivery_date, price_per_gallon, total_amount_due) values($1,$2,$3,$4,$5,$6)', [id, gallons, deliveryAddress, deliveryDate, ppg, totalPrice])
+        //const postQuery = await client.query('insert into fuelquotes(user_id, gallons_requested, delivery_address, delivery_date, price_per_gallon, total_amount_due) values($1,$2,$3,$4,$5,$6)', [id, gallons, deliveryAddress, deliveryDate, ppg, totalPrice])
         // Construct the fuel quote object
         // const fuelQuote = { gallons: parseFloat(gallons), deliveryAddress, deliveryDate, totalPrice, ppg };
 

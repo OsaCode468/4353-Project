@@ -118,15 +118,36 @@ router.get("/getID/:username", async (req, res) => {
         const query = 'SELECT id FROM users WHERE username = $1';
         const result = await client.query(query, [username]);
         const id = result.rows[0].id;
-        const address = 'SELECT address1, state FROM client_profiles WHERE user_id = $1';
-        const ress = await client.query(address, [id]);
+        //const address = 'SELECT address1, state FROM client_profiles WHERE user_id = $1';
+        //const ress = await client.query(address, [id]);
         //console.log(id);
 
         client.release();
 
-        res.status(200).json({ 'add': ress.rows[0].address1, 'stat': ress.rows[0].state });
+        res.status(200).json({ 'id': id });
     } catch (error) {
         console.log('Error retrieving id:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+router.get("/getAddress/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const client = await db.connect();
+        const query = 'SELECT address1, city, state, zipcode FROM client_profiles WHERE user_id = $1';
+        const result = await client.query(query, [id]);
+        const address = result.rows[0].address1;
+        const city = result.rows[0].city;
+        const state = result.rows[0].state;
+        const zipcode = result.rows[0].zipcode;
+        //console.log(id);
+
+        client.release();
+
+        res.status(200).json({ 'address': address, 'city': city, 'state': state, 'zipcode': zipcode });
+    } catch (error) {
+        console.log('Error retrieving address:', error);
         res.status(500).send('Internal Server Error');
     }
 })
@@ -135,10 +156,11 @@ router.get("/getID/:username", async (req, res) => {
 
 
 
+
+
 router.post('/', async (req, res) => {
     const client = await db.connect()
-    const { gallons, deliveryDate, deliveryAddress, userName } = req.body;
-    console.log(userName)
+    const { gallons, deliveryAddress, deliveryDate, id, priceG, totalAmount } = req.body;
     //ADD DELIVERY ADDRESS QUERY
     if (!gallons || isNaN(gallons)) {
         return res.status(400).json({ error: 'Gallons requested must be a numeric value' });
@@ -149,18 +171,8 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const q = await client.query('SELECT id from users where username = $1', [userName])
-        console.log("this is the " + q)
-        const id = q.rows[0].id
-        console.log(id)
-        // Fetch delivery address from the database
-        // const deliveryAddress = await getDeliveryAddressFromDatabase();
 
-        // Calculate total price and get price per gallon
-        const totalPrice = 10;
-        const ppg = 8;
-
-        const postQuery = await client.query('insert into fuelquotes(user_id, gallons_requested, delivery_address, delivery_date, price_per_gallon, total_amount_due) values($1,$2,$3,$4,$5,$6)', [id, gallons, deliveryAddress, deliveryDate, ppg, totalPrice])
+        const postQuery = await client.query('insert into fuelquotes(user_id, gallons_requested, delivery_address, delivery_date, price_per_gallon, total_amount_due) values($1,$2,$3,$4,$5,$6)', [id, gallons, deliveryAddress, deliveryDate, priceG, totalAmount])
         // Construct the fuel quote object
         // const fuelQuote = { gallons: parseFloat(gallons), deliveryAddress, deliveryDate, totalPrice, ppg };
 
