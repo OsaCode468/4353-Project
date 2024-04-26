@@ -125,9 +125,9 @@ function FuelQuoteHistory() {
               <tr key={key}>
                 <td>{val.gallons_requested}</td>
                 <td>{val.delivery_address}</td>
-                <td>{val.delivery_date}</td>
-                <td>{val.price_per_gallon}</td>
-                <td>{val.total_amount_due}</td>
+                <td>{val.delivery_date.slice(0,10)}</td>
+                <td>${val.price_per_gallon}</td>
+                <td>${val.total_amount_due}</td>
               </tr>
             );
           })}

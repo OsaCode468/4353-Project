@@ -42,13 +42,13 @@ const getUserIdFromUsername = async (username) => {
 // POST route to create or update a client profile
 router.post("/", validateClientProfile, async (req, res) => {
   const { username, fullName, address1, address2, city, state, zipcode } = req.body;
+  const client = await pool.connect();
   try {
     const user_id = await getUserIdFromUsername(username);
     if (!user_id) {
       return res.status(404).json({ message: "User not found." });
     }
     
-    const client = await pool.connect();
     const checkProfile = await client.query("SELECT id FROM client_profiles WHERE user_id = $1", [user_id]);
     if (checkProfile.rows.length > 0) {
       // Update existing profile
