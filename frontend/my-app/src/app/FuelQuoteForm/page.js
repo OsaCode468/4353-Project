@@ -18,9 +18,29 @@ const FuelQuoteForm = () => {
     const [redirectToLogin, setRedirectToLogin] = useState(false);
     const { user } = useAuthContext();
 
+    useEffect(() => {
+        if (user && user.username) {
+            fetchAddress(user.username);
+        }
+    }, [user]);
 
 
 
+
+
+    const fetchAddress = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/fuelquotemodule/getID/${username}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch the address. Please try again.');
+            }
+            const data = await response.json();
+            setDeliveryAddress(data.add + ', ' + data.stat); // Assuming 'add' contains the delivery address
+            // You can also set other states here if needed, e.g., for state or other related data.
+        } catch (error) {
+            console.error('Error fetching address:', error);
+        }
+    };
 
 
 
@@ -76,6 +96,10 @@ const FuelQuoteForm = () => {
             }
 
             const quoteData = await response.json();
+            console.log(quoteData.ppg, quoteData.totalAmountDue)
+            setPriceG(quoteData.ppg)
+            setTotalAmount(quoteData.totalAmountDue)
+            setFormSubmitted(true);
             // setSuggestedPrice(quoteData.suggestedPrice);
             // setTotalAmount(quoteData.totalAmount);
         } catch (error) {
@@ -109,7 +133,7 @@ const FuelQuoteForm = () => {
                 throw new Error('Failed to save fuel quote. Please try again.');
             }
 
-            setFormSubmitted(true);
+            // setFormSubmitted(true);
             console.log('Fuel quote saved successfully');
         } catch (error) {
             console.error('Error saving fuel quote:', error);
@@ -207,13 +231,31 @@ const FuelQuoteForm = () => {
                     </div>
                 </form>
                 {formSubmitted &&
-                    <TotAmount
-                        gallons={gallons}
-                        deliveryAddress={deliveryAddress}
-                        deliveryDate={deliveryDate}
-                        priceG={priceG}
-                    />
+                    <>
+                        <TotAmount
+                            totalAmount={totalAmount}
+                        />
+                        <div className="text-center mt-4">
+                            <button
+                                type="button"
+                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                onClick={handleSubmit}
+                            >
+                                Submit Quote
+                            </button>
+                        </div>
+                    </>
                 }
+
+                {/* {formSubmitted &&
+                    <TotAmount
+                        totalAmount={totalAmount}
+                    // gallons={gallons}
+                    // deliveryAddress={deliveryAddress}
+                    // deliveryDate={deliveryDate}
+                    // priceG={priceG}
+                    />
+                } */}
             </div>
         </div>
     );

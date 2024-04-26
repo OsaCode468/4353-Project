@@ -1,6 +1,6 @@
-const TotAmount = ({ gallons, deliveryAddress, deliveryDate, priceG }) => {
+const TotAmount = ({ totalAmount }) => {
     // Calculate total amount
-    const totalAmount = (parseFloat(gallons) * parseFloat(priceG)).toFixed(2); // Assuming priceG is a string, parse it to float
+    // const totalAmount = (parseFloat(gallons) * parseFloat(priceG)).toFixed(2); // Assuming priceG is a string, parse it to float
 
     return (
         <>
@@ -19,6 +19,28 @@ const TotAmount = ({ gallons, deliveryAddress, deliveryDate, priceG }) => {
         </>
     );
 }
+
+// const TotAmount = ({ gallons, deliveryAddress, deliveryDate, priceG }) => {
+//     // Calculate total amount
+//     // const totalAmount = (parseFloat(gallons) * parseFloat(priceG)).toFixed(2); // Assuming priceG is a string, parse it to float
+
+//     return (
+//         <>
+//             <hr className='my-8'></hr>
+//             <div className="flex flex-wrap -mx-3 mb-6">
+//                 <div className="w-full px-3">
+//                     <label className="text-xl block uppercase tracking-wide text-white font-bold mb-2" htmlFor="zipcode">
+//                         Total Amount Due :
+//                     </label>
+//                     {/* <p className="text-white">{`Delivery Address: ${deliveryAddress}`}</p>
+//                     <p className="text-white">{`Delivery Date: ${deliveryDate}`}</p>
+//                     <p className="text-white">{`Price per Gallon: $${priceG}`}</p> */}
+//                     <p className="text-xl font-medium text-white">{`$${totalAmount}`}</p>
+//                 </div>
+//             </div>
+//         </>
+//     );
+// }
 
 export default TotAmount;
 
