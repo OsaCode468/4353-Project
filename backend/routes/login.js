@@ -43,9 +43,9 @@ router.post("/", async (req, res) => {
     }
     const client = await pool.connect()
     const userExists = await client.query('SELECT COUNT(*) FROM users WHERE username = $1', [username])
-    if (parseInt(userExists.rows[0]?.count) > 0){
-        return res.status(400).json({"err":"Username already in use"})
-    } 
+    // if (parseInt(userExists.rows[0]?.count) > 0){
+    //     return res.status(400).json({"err":"Username already in use"})
+    // } 
     
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
